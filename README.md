@@ -8,9 +8,9 @@ A make.fun entry for the [news-image-20261125](https://make.fun/bounty/news-imag
 
 ## The image
 
-A newspaper front page, drawn by `compose.py` (Pillow) around a generated photograph of a cargo ship in the Gulf of Finland at dusk. Every story is the day's news as first reported on Wednesday 25 November 2026, verified against live reporting:
+A newspaper front page, drawn by `compose.py` (Pillow) around a generated photograph of a cargo ship in the Gulf of Finland at dusk — the very ship in the lead story. Every story is the day's news as first reported on Wednesday 25 November 2026, verified against live reporting:
 
-1. Kyiv says it sank a Russian warship and hit a cargo ship — President Zelenskyy confirmed Ukrainian drones struck two Russian vessels: a warship sunk off Benghazi, Libya, and a cargo ship hit in the Gulf of Finland. Moscow called the strikes "terrorism" and vowed consequences; Norway urged caution (Reuters; RFE/RL).
+1. Ukrainian drones struck two Russian vessels — a warship sunk off Benghazi, Libya, and a cargo ship hit in the Gulf of Finland. President Zelenskyy confirmed the strikes; Moscow called them "terrorism" and vowed consequences; Norway urged caution (Reuters; RFE/RL).
 2. Houthi drone hits Riyadh's tallest tower — eleven people wounded, Saudi civil defence says (Reuters).
 3. CIA and spy chief's office hit by cyber breach — unclassified information taken in a breach of the CIA and the Director of National Intelligence, sources say (Reuters).
 4. NATO sends early-warning jets to Poland — surveillance aircraft move east after missiles landed in Poland during an attack on Ukraine.
