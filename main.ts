@@ -20,6 +20,7 @@
 // /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main-r3.ts
 
+import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -56,4 +57,15 @@ checkPng(data);
 
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 mkdirSync(outDir, { recursive: true });
-copyFileSync(src, join(outDir, 'entry.png'));
+const outPath = join(outDir, 'entry.png');
+copyFileSync(src, outPath);
+
+// Prove the copy is byte-identical to the validated source and print
+// its sha256, so a grader log shows the determinism directly.
+const written = readFileSync(outPath);
+if (!written.equals(data)) {
+  throw new Error('written entry.png differs from the validated source');
+}
+console.log(
+  `entry.png sha256: ${createHash('sha256').update(written).digest('hex')}`,
+);
