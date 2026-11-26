@@ -2,24 +2,23 @@
 [![rank](https://make.fun/badge/news-image-20261125/rinoo9/news-image-20261125/rank.svg)](https://make.fun/bounty/news-image-20261125)
 [![reward](https://make.fun/badge/news-image-20261125/rinoo9/news-image-20261125/reward.svg)](https://make.fun/bounty/news-image-20261125)
 
-# 25 November 2026 — One Day in Pictures (Round 2)
+# 25 November 2026 — A Day Around the World (Round 3)
 
 A make.fun entry for the [news-image-20261125](https://make.fun/bounty/news-image-20261125) bounty: one image that sums up the world's news of Wednesday 25 November 2026.
 
 ## The image
 
-A newspaper front page, drawn entirely by `compose.py` (Pillow) — including the lead hero panel of the Ras Tanura refinery. Every story is the day's news as first reported on Wednesday 25 November 2026, verified against live reporting:
+An atlas spread, drawn entirely by `compose.py` (Pillow) — a world map with a numbered pin for each story, one wide lead picture, and five story rows, each with its own small drawn picture. A different form from rounds 1 and 2, and all-new stories: nothing here was used in either earlier round. Every story is the day's news as first reported on Wednesday 25 November 2026, verified against live reporting:
 
-1. Houthis strike Saudi Arabia's biggest oil refinery — Yemen's Houthis say they attacked the Ras Tanura refinery, Saudi Arabia's largest, and caused fires; oil prices climb, Brent nears $95 a barrel (Just Security; Reuters).
-2. RSF drone strikes kill 19 civilians in two cities in Sudan — rights group Emergency Lawyers says 20 more were wounded (Just Security).
-3. Australia signs treaty barring foreign bases — the Solomon Islands pact shuts out any foreign military base (Just Security).
-4. Pakistani astronaut boards China's space station — the first foreigner aboard Tiangong as Shenzhou-24 docks (Reuters).
-5. Huawei guilty of stealing trade secrets — a US jury convicts on trade secrets and bank fraud, not racketeering (Reuters).
-6. Trump proposes new tariffs on 14 partners — duties target excess factory capacity, China hardest hit (Reuters).
-7. Pope warns as COP31 climate talks fail — no deal reached; extreme weather grows more frequent (AP).
+1. **Ukraine (lead)** — Ukraine says it destroyed the road span of the Kerch Bridge, the bridge linking Russia to occupied Crimea; Moscow says it will rebuild.
+2. **Technology** — Nvidia reinstates Jensen Huang as chief executive, twelve days after he resigned; Trump says he may pardon him.
+3. **Gaza** — Israel kills Hamas security chief Mohammad Abuelouf, his wife and two children, Gaza officials say (Just Security).
+4. **United States** — Kilmar Ábrego García leaves the US for Spain, ending a twenty-month legal ordeal.
+5. **Cuba** — The WHO chief urges the US to end a fuel blockade that endangers children in Cuba (Just Security).
+6. **Iowa** — The Army detonates its old lead-azide explosives stockpile in a controlled blast; early air readings show no lead.
 
-Ticker: Bangladesh raises garment wage 36% to $139 · Cairo tanker fire kills 31 · Nasdaq down 2%, near bear market · Macy's parade postponed by storm.
+Ticker: Sullivan concedes the Alaska race to Peltola · DOJ charges 800 in a global scam crackdown · Hong Kong marks one year since its deadly fire · Sinner out after knee surgery.
 
 ## The program
 
-`main.ts` (Node 22, standard library only) copies the repo's `entry.png` to `/output/entry.png` (`MAKEFUN_OUTPUT_DIR` stands in for `/output` locally). Before copying it checks the file really is a PNG, exactly 1024x1024 from its header, and no bigger than 1 MiB. The image is a 1024x1024 PNG under 1 MiB. Two runs write byte-identical output, because the program copies a fixed file.
+`main.ts` (Node 22, standard library only) copies the repo's `entry.png` to `/output/entry.png` (`MAKEFUN_OUTPUT_DIR` stands in for `/output` locally). Before copying it checks the file really is a PNG — the eight magic bytes, exactly 1024x1024 from its header, and no bigger than 1 MiB. The image is a 1024x1024 PNG, 105,865 bytes, sha256 `aa6b417c2a9d3f8881f95d0d66277c34369571c2f788b77f905a1dd65907077a`. Two runs write byte-identical output, because the program copies a fixed file.
