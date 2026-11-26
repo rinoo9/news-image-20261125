@@ -1,46 +1,70 @@
 #!/usr/bin/env python3
-"""Compose the round-2 front page for news-image-20261125 (1024x1024 PNG).
+"""Draw the round-3 front image for news-image-20261125 (1024x1024 PNG).
 
-A fresh take on Wednesday 25 November 2026: all-new stories, all-new
-drawn panels, same newspaper front-page form as round 1. Lead: the
-Houthi strike on Saudi Arabia's Ras Tanura refinery. The hero is drawn
-with Pillow (no generated photo), so the whole image is produced by
-this one deterministic script.
+Form: an atlas spread, not a newspaper grid. A dark masthead, a world
+map band with numbered pins for the six stories, one wide lead picture
+(the Kerch Bridge road span, destroyed), then five story rows, each with
+its own small drawn picture, and a ticker strip at the foot.
 
-Deterministic: fixed layout, fixed fonts, fixed seeded decoration, no
-randomness in the output, no network, no timestamps in the image.
-Run: python3 compose-r2.py
-Writes entry.png next to this file.
+Stories: Wednesday 25 November 2026, none of them used in round 1 or
+round 2 (round 1: Gulf of Finland warship, Riyadh tower, CIA breach,
+NATO jets, Hormuz tankers, Gaza toll, Giuliani medal; round 2: Ras
+Tanura, Sudan RSF, Australia treaty, Pakistani astronaut, Huawei,
+Trump tariffs, Pope/COP31).
+
+  1. UKRAINE (lead) — Ukraine says it destroyed the road span of the
+     Kerch Bridge; Russia says it will rebuild.
+  2. TECHNOLOGY — Nvidia reinstates Jensen Huang as chief executive,
+     twelve days after he resigned; Trump says he may pardon him.
+  3. GAZA — Israel kills Hamas security chief Mohammad Abuelouf, his
+     wife and two children, Gaza officials say.
+  4. UNITED STATES — Kilmar Abrego Garcia leaves the US for Spain,
+     ending a twenty-month legal ordeal.
+  5. CUBA — The WHO chief urges the US to end a fuel blockade that
+     endangers children in Cuba.
+  6. IOWA — The Army detonates its old lead-azide stockpile in a
+     controlled blast; early air readings show no lead.
+
+Ticker: Sullivan concedes Alaska race to Peltola; DOJ charges 800 in
+a global scam crackdown; Hong Kong marks one year since its deadly
+fire; Sinner out after knee surgery.
+
+Deterministic: fixed geometry, fixed fonts, no randomness, no network,
+no timestamps anywhere in the image.
+Run:  python3 compose-r3.py
+Writes entry-r3.png next to this file.
 """
-import math
 import os
-import random
+
 from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 W, H = 1024, 1024
-PAPER = (247, 243, 233)
-INK = (18, 24, 38)
+PAPER = (250, 246, 236)
+INK = (16, 22, 34)
+NAVY = (24, 44, 78)
 RED = (178, 34, 34)
-NAVY = (28, 52, 92)
-GREY = (90, 92, 96)
-RULE = (18, 24, 38)
+GOLD = (214, 164, 60)
+GREY = (96, 98, 104)
+SEA = (168, 198, 224)
+LAND = (148, 168, 118)
+MARGIN = 20
 
-SERIF_B = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
-SANS_B = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+SERIF = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
+SANSB = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 SANS = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 
-def font(path, size):
+def fnt(path, size):
     return ImageFont.truetype(path, size)
 
 
-def wrap(draw, text, fnt, max_w):
+def wrap_lines(d, text, font, max_w):
     words = text.split()
     lines, cur = [], ""
     for word in words:
         trial = (cur + " " + word).strip()
-        if draw.textlength(trial, font=fnt) <= max_w:
+        if d.textlength(trial, font=font) <= max_w:
             cur = trial
         else:
             if cur:
@@ -51,203 +75,210 @@ def wrap(draw, text, fnt, max_w):
     return lines
 
 
-def text_block(draw, x, y, text, fnt, color, max_w, leading):
-    lines = wrap(draw, text, fnt, max_w)
-    for line in lines:
-        draw.text((x, y), line, font=fnt, fill=color)
+def para(d, x, y, text, font, color, max_w, leading):
+    for line in wrap_lines(d, text, font, max_w):
+        d.text((x, y), line, font=font, fill=color)
         y += leading
     return y
 
 
-def rule(draw, x0, y, x1, width=2):
-    draw.line([(x0, y), (x1, y)], fill=RULE, width=width)
+def hline(d, x0, y, x1, width=2, color=INK):
+    d.line([(x0, y), (x1, y)], fill=color, width=width)
 
 
-def flame(d, cx, base_y, w, h):
-    """A stylised flame: orange outer, yellow inner."""
-    d.polygon([(cx - w, base_y), (cx - w // 2, base_y - h),
-               (cx, base_y - h - 10), (cx + w // 2, base_y - h),
-               (cx + w, base_y)], fill=(255, 140, 40))
-    d.polygon([(cx - w // 2, base_y), (cx - w // 4, base_y - h // 2),
-               (cx, base_y - h // 2 - 6), (cx + w // 4, base_y - h // 2),
-               (cx + w // 2, base_y)], fill=(255, 196, 60))
+def pin(d, x, y, num):
+    d.ellipse([x - 13, y - 13, x + 13, y + 13], fill=RED,
+              outline=(255, 255, 255), width=2)
+    d.text((x, y), str(num), font=fnt(SANSB, 17), fill=(255, 255, 255),
+           anchor="mm")
 
 
-def smoke(d, cx, cy, r, color=(150, 150, 150)):
+def draw_map(d, x, y, w, h):
+    """A simplified world map: sea, rough continents, numbered pins."""
+    d.rectangle([x, y, x + w, y + h], fill=SEA)
+    # North America
+    d.polygon([(x + 30, y + 14), (x + 190, y + 8), (x + 235, y + 26),
+               (x + 215, y + 52), (x + 160, y + 66), (x + 120, y + 82),
+               (x + 70, y + 68), (x + 38, y + 40)], fill=LAND)
+    # Central America narrows toward South America
+    d.polygon([(x + 120, y + 82), (x + 165, y + 86), (x + 175, y + 100),
+               (x + 140, y + 104), (x + 118, y + 96)], fill=LAND)
+    # South America
+    d.polygon([(x + 175, y + 104), (x + 250, y + 100), (x + 285, y + 118),
+               (x + 262, y + 136), (x + 225, y + 140), (x + 200, y + 124),
+               (x + 178, y + 112)], fill=LAND)
+    # Europe
+    d.polygon([(x + 470, y + 18), (x + 545, y + 12), (x + 565, y + 34),
+               (x + 540, y + 52), (x + 495, y + 50), (x + 472, y + 34)],
+              fill=LAND)
+    # Africa
+    d.polygon([(x + 480, y + 56), (x + 560, y + 52), (x + 590, y + 78),
+               (x + 575, y + 112), (x + 540, y + 124), (x + 505, y + 100),
+               (x + 478, y + 78)], fill=LAND)
+    # Asia
+    d.polygon([(x + 570, y + 10), (x + 880, y + 6), (x + 940, y + 28),
+               (x + 905, y + 58), (x + 830, y + 76), (x + 760, y + 72),
+               (x + 700, y + 56), (x + 620, y + 48), (x + 575, y + 32)],
+              fill=LAND)
+    # Australia
+    d.polygon([(x + 810, y + 126), (x + 890, y + 122), (x + 905, y + 136),
+               (x + 870, y + 142), (x + 825, y + 138)], fill=LAND)
+    # Story pins, numbered in story order:
+    # 1 Kerch Bridge (Black Sea), 2 California (Nvidia),
+    # 3 Gaza, 4 Madrid (Abrego Garcia to Spain),
+    # 5 Havana (Cuba), 6 Iowa.
+    pin(d, x + 585, y + 44, 1)
+    pin(d, x + 92, y + 56, 2)
+    pin(d, x + 556, y + 62, 3)
+    pin(d, x + 478, y + 44, 4)
+    pin(d, x + 168, y + 78, 5)
+    pin(d, x + 168, y + 44, 6)
+    d.text((x + 8, y + h - 22), "WHERE THE DAY HAPPENED",
+           font=fnt(SANSB, 15), fill=NAVY)
+
+
+def puff(d, cx, cy, r, color=(140, 140, 140)):
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
 
 
-def hero_refinery(d, x, y, w, h):
-    """Ras Tanura refinery at dusk: columns, flare stacks, fire, smoke."""
-    d.rectangle([x, y, x + w, y + h], fill=(232, 178, 120))
-    d.ellipse([x + w - 90, y + 8, x + w - 30, y + 68], fill=(250, 220, 150))
-    d.rectangle([x, y + h - 34, x + w, y + h], fill=(70, 60, 54))
-    # distillation columns
-    for cx, cw, ch in ((x + 90, 46, 96), (x + 170, 38, 78), (x + 250, 52, 108)):
-        d.rectangle([cx, y + h - 34 - ch, cx + cw, y + h - 34],
-                    fill=(96, 104, 118))
-        d.rectangle([cx - 6, y + h - 34 - ch, cx + cw + 6,
-                     y + h - 34 - ch + 8], fill=(70, 78, 92))
-        d.rectangle([cx + cw // 2 - 3, y + h - 34 - ch - 16,
-                     cx + cw // 2 + 3, y + h - 34 - ch], fill=(70, 78, 92))
-    # flare stacks with flames
-    for fx in (x + 380, x + 450):
-        d.rectangle([fx - 5, y + 44, fx + 5, y + h - 34], fill=(52, 58, 66))
-        flame(d, fx, y + 46, 16, 30)
-    # storage tanks
-    for tx in (x + 330, x + 500):
-        d.ellipse([tx, y + h - 84, tx + 64, y + h - 34], fill=(214, 222, 235))
-        d.rectangle([tx, y + h - 68, tx + 64, y + h - 34],
-                    fill=(214, 222, 235))
-    # fire at the base of the first column + smoke rising
-    flame(d, x + 113, y + h - 30, 26, 44)
-    flame(d, x + 200, y + h - 30, 18, 30)
-    for cx, cy, r in ((x + 113, y + 34, 14), (x + 126, y + 20, 10),
-                      (x + 100, y + 18, 8), (x + 200, y + 44, 11)):
-        smoke(d, cx, cy, r)
+def bridge_hero(d, x, y, w, h):
+    """The Kerch Bridge over the strait, its road span broken open."""
+    d.rectangle([x, y, x + w, y + h], fill=(196, 214, 232))
+    d.ellipse([x + w - 110, y + 10, x + w - 40, y + 80],
+              fill=(250, 224, 150))
+    # sea
+    d.rectangle([x, y + h - 46, x + w, y + h], fill=(44, 92, 160))
+    for wx in range(x + 10, x + w, 46):
+        d.arc([wx, y + h - 34, wx + 34, y + h - 20], 180, 360,
+              fill=(120, 170, 220), width=2)
+    # two towers
+    for tx in (x + 250, x + 660):
+        d.rectangle([tx - 8, y + 30, tx + 8, y + h - 46], fill=(96, 104, 118))
+        d.line([(tx, y + 30), (tx - 120, y + h - 46)], fill=(70, 78, 92),
+               width=2)
+        d.line([(tx, y + 30), (tx + 120, y + h - 46)], fill=(70, 78, 92),
+               width=2)
+    # deck, left half and right half, with the middle span gone
+    d.rectangle([x, y + h - 66, x + 430, y + h - 46], fill=(214, 222, 235))
+    d.rectangle([x + 560, y + h - 66, x + w, y + h - 46],
+                fill=(214, 222, 235))
+    # the fallen span, tilted into the water
+    d.polygon([(x + 440, y + h - 62), (x + 545, y + h - 58),
+               (x + 530, y + h - 30), (x + 455, y + h - 26)],
+              fill=(150, 158, 172))
+    # fire and smoke where the span broke
+    d.polygon([(x + 478, y + h - 58), (x + 488, y + h - 96),
+               (x + 498, y + h - 58)], fill=(255, 140, 40))
+    d.polygon([(x + 488, y + h - 58), (x + 494, y + h - 84),
+               (x + 500, y + h - 58)], fill=(255, 196, 60))
+    for cx, cy, r in ((x + 492, y + 34, 15), (x + 508, y + 18, 11),
+                      (x + 476, y + 16, 9), (x + 520, y + 36, 8)):
+        puff(d, cx, cy, r)
 
 
-def drone_panel(d, x, y, w, h):
-    """A drone over a city skyline at dusk, smoke rising."""
+def chip_thumb(d, x, y, w, h):
+    """A green circuit board with a chip at its centre."""
+    d.rectangle([x, y, x + w, y + h], fill=(24, 96, 60))
+    for gx in range(x + 8, x + w - 8, 18):
+        d.line([(gx, y + 6), (gx, y + h - 6)], fill=(60, 160, 100), width=1)
+    for gy in range(y + 8, y + h - 8, 18):
+        d.line([(x + 6, gy), (x + w - 6, gy)], fill=(60, 160, 100), width=1)
+    cx, cy = x + w // 2, y + h // 2
+    d.rectangle([cx - 26, cy - 18, cx + 26, cy + 18], fill=(30, 34, 40))
+    d.rectangle([cx - 16, cy - 10, cx + 16, cy + 10], fill=(214, 164, 60))
+    for px in range(cx - 20, cx + 21, 10):
+        d.line([(px, cy - 24), (px, cy - 18)], fill=(200, 208, 220), width=2)
+        d.line([(px, cy + 18), (px, cy + 24)], fill=(200, 208, 220), width=2)
+
+
+def skyline_thumb(d, x, y, w, h):
+    """A city skyline at dusk, one building damaged, smoke rising."""
     d.rectangle([x, y, x + w, y + h], fill=(214, 150, 110))
-    d.rectangle([x, y + h - 30, x + w, y + h], fill=(60, 52, 48))
-    for bx, bw, bh in ((x + 14, 52, 46), (x + 78, 40, 66), (x + 130, 58, 38),
-                       (x + 200, 44, 58), (x + 256, 50, 44)):
-        d.rectangle([bx, y + h - 30 - bh, bx + bw, y + h - 30],
+    d.rectangle([x, y + h - 12, x + w, y + h], fill=(60, 52, 48))
+    for bx, bw, bh in ((x + 6, 26, 34), (x + 36, 22, 48), (x + 62, 26, 30),
+                       (x + 92, 22, 42)):
+        d.rectangle([bx, y + h - 12 - bh, bx + bw, y + h - 12],
                     fill=(90, 78, 72))
-        for wy in range(y + h - 30 - bh + 8, y + h - 36, 12):
-            d.rectangle([bx + 8, wy, bx + 16, wy + 6], fill=(250, 196, 90))
-    # quadcopter drone
-    cx, cy = x + w // 2, y + 34
-    d.rectangle([cx - 26, cy - 3, cx + 26, cy + 3], fill=(30, 34, 40))
-    d.rectangle([cx - 6, cy + 3, cx + 6, cy + 12], fill=(30, 34, 40))
-    for px in (cx - 30, cx + 30):
-        d.ellipse([px - 12, cy - 8, px + 12, cy + 2], outline=(30, 34, 40),
-                  width=2)
-    for sx, sy, r in ((x + 240, y + 26, 12), (x + 252, y + 14, 8),
-                      (x + 228, y + 12, 7)):
-        smoke(d, sx, sy, r)
+        for wy in range(y + h - 12 - bh + 6, y + h - 16, 10):
+            d.rectangle([bx + 5, wy, bx + 11, wy + 5], fill=(250, 196, 90))
+    # damaged building: top corner missing, smoke above it
+    d.polygon([(x + 62, y + h - 12 - 30), (x + 74, y + h - 12 - 30),
+               (x + 88, y + h - 12 - 18), (x + 88, y + h - 12),
+               (x + 62, y + h - 12)], fill=(70, 60, 54))
+    for cx, cy, r in ((x + 76, y + 12, 8), (x + 84, y + 6, 6)):
+        puff(d, cx, cy, r)
 
 
-def treaty_panel(d, x, y, w, h):
-    """A Pacific island with two flagpoles: Australia and Solomon Islands."""
+def plane_thumb(d, x, y, w, h):
+    """An airliner crossing a sunset sky over the sea."""
+    d.rectangle([x, y, x + w, y + h], fill=(250, 196, 120))
+    d.ellipse([x + w - 34, y + 6, x + w - 10, y + 30], fill=(250, 240, 200))
+    d.rectangle([x, y + h - 16, x + w, y + h], fill=(44, 92, 160))
+    cx, cy = x + w // 2, y + h // 2
+    d.ellipse([cx - 34, cy - 7, cx + 34, cy + 7], fill=(240, 244, 250))
+    d.polygon([(cx + 26, cy - 6), (cx + 44, cy - 16), (cx + 40, cy - 2)],
+              fill=(200, 208, 220))
+    d.polygon([(cx - 4, cy + 6), (cx + 10, cy + 18), (cx + 16, cy + 6)],
+              fill=(200, 208, 220))
+    d.line([(cx - 40, cy), (cx - 52, cy)], fill=(200, 208, 220), width=3)
+
+
+def island_thumb(d, x, y, w, h):
+    """A Caribbean island: palm, beach, and a fuel drum on the shore."""
     d.rectangle([x, y, x + w, y + h], fill=(178, 205, 228))
-    d.rectangle([x, y + h - 26, x + w, y + h], fill=(44, 92, 128))
-    for wx in range(x, x + w, 24):
-        d.arc([wx, y + h - 36, wx + 24, y + h - 20], 180, 360,
+    d.rectangle([x, y + h - 18, x + w, y + h], fill=(44, 92, 160))
+    for wx in range(x, x + w, 22):
+        d.arc([wx, y + h - 26, wx + 22, y + h - 12], 180, 360,
               fill=(44, 92, 128), width=2)
-    # island
-    d.polygon([(x + 60, y + h - 26), (x + 120, y + h - 66),
-               (x + 200, y + h - 66), (x + 260, y + h - 26)],
-              fill=(96, 122, 90))
-    d.polygon([(x + 150, y + h - 66), (x + 160, y + h - 96),
-               (x + 170, y + h - 66)], fill=(70, 96, 66))
-    # flagpoles: blue ensign left, blue field with stars right
-    for fx, col in ((x + 96, (36, 68, 140)), (x + 216, (36, 68, 140))):
-        d.line([(fx, y + 22), (fx, y + h - 66)], fill=(52, 58, 66), width=3)
-        d.polygon([(fx, y + 22), (fx + 44, y + 32), (fx, y + 42)],
-                  fill=col)
-    d.polygon([(x + 216, y + 22), (x + 260, y + 32), (x + 216, y + 42)],
-              fill=(36, 120, 70))
-    for sx, sy in ((x + 236, y + 30), (x + 246, y + 26), (x + 246, y + 36)):
-        d.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=(255, 240, 180))
+    d.polygon([(x + 18, y + h - 18), (x + 44, y + h - 40),
+               (x + 78, y + h - 40), (x + 100, y + h - 18)],
+              fill=(220, 200, 140))
+    # palm
+    d.line([(x + 52, y + h - 40), (x + 52, y + 14)], fill=(96, 72, 40),
+           width=3)
+    for dx, dy in ((-16, -6), (-12, 4), (16, -6), (12, 4)):
+        d.arc([x + 52 + dx - 10, y + 14 + dy - 6, x + 52 + dx + 10,
+               y + 14 + dy + 6], 0, 180, fill=(60, 120, 60), width=2)
+    # red fuel drum
+    d.rectangle([x + 82, y + h - 34, x + 98, y + h - 18], fill=RED)
+    d.line([(x + 82, y + h - 29), (x + 98, y + h - 29)], fill=(120, 20, 20),
+           width=1)
 
 
-def space_panel(d, x, y, w, h):
-    """A space station over Earth's curve, capsule docking."""
-    d.rectangle([x, y, x + w, y + h], fill=(16, 22, 40))
-    rng = random.Random(11)
-    for _ in range(26):
-        sx = x + rng.randint(6, w - 6)
-        sy = y + rng.randint(6, h - 40)
-        d.ellipse([sx, sy, sx + 2, sy + 2], fill=(235, 240, 250))
-    # Earth curve
-    d.ellipse([x - 60, y + h - 26, x + w + 60, y + h + 60],
-              fill=(44, 92, 160))
-    d.ellipse([x - 60, y + h - 26, x + w + 60, y + h + 60],
-              outline=(120, 170, 220), width=2)
-    # station: core module + solar wings
-    cx, cy = x + w // 2, y + h // 2 - 6
-    d.rectangle([cx - 70, cy - 12, cx + 70, cy + 12], fill=(200, 208, 220))
-    d.rectangle([cx - 70, cy - 12, cx - 46, cy + 12], fill=(150, 158, 172))
-    d.rectangle([cx - 118, cy - 20, cx - 72, cy + 20], fill=(36, 68, 140))
-    d.rectangle([cx + 72, cy - 20, cx + 118, cy + 20], fill=(36, 68, 140))
-    for gx in range(cx - 116, cx - 74, 10):
-        d.line([(gx, cy - 20), (gx, cy + 20)], fill=(90, 120, 180), width=1)
-    for gx in range(cx + 74, cx + 118, 10):
-        d.line([(gx, cy - 20), (gx, cy + 20)], fill=(90, 120, 180), width=1)
-    # docking capsule
-    d.ellipse([cx + 78, cy - 8, cx + 98, cy + 8], fill=(232, 182, 60))
-
-
-def court_panel(d, x, y, w, h):
-    """A courthouse front with columns and a gavel."""
-    d.rectangle([x, y, x + w, y + h], fill=(58, 74, 102))
-    d.polygon([(x + 40, y + 18), (x + w - 40, y + 18), (x + w // 2, y + 44)],
-              fill=(214, 222, 235))
-    for cx in (x + 70, x + 140, x + 210, x + 280):
-        d.rectangle([cx - 12, y + 46, cx + 12, y + h - 18],
-                    fill=(214, 222, 235))
-    d.rectangle([x + 40, y + h - 18, x + w - 40, y + h - 8],
-                fill=(214, 222, 235))
-    # gavel, head horizontal, handle diagonal down to the right
-    gx, gy = x + w - 78, y + h - 52
-    d.rectangle([gx - 22, gy - 8, gx + 22, gy + 8], fill=(120, 82, 40))
-    d.ellipse([gx - 22, gy - 8, gx - 12, gy + 8], fill=(90, 60, 28))
-    d.ellipse([gx + 12, gy - 8, gx + 22, gy + 8], fill=(90, 60, 28))
-    d.line([(gx + 8, gy + 6), (gx + 30, gy + 30)], fill=(120, 82, 40),
-           width=6)
-    d.rectangle([x + 40, y + h - 18, x + w - 40, y + h - 8],
-                fill=(214, 222, 235))
-
-
-def tariff_panel(d, x, y, w, h):
-    """Stacked shipping containers under a big percent sign."""
+def field_thumb(d, x, y, w, h):
+    """An Iowa field at dawn: fence posts and a blast cloud on the
+    horizon."""
     d.rectangle([x, y, x + w, y + h], fill=(232, 214, 170))
-    cols = ((178, 60, 50), (60, 96, 140), (196, 160, 60), (70, 120, 80))
-    for row in range(2):
-        for col in range(4):
-            bx = x + 12 + col * 76
-            by = y + h - 34 - (row + 1) * 30
-            d.rectangle([bx, by, bx + 70, by + 28], fill=cols[col])
-            for vx in range(bx + 8, bx + 66, 10):
-                d.line([(vx, by + 3), (vx, by + 25)], fill=(0, 0, 0), width=1)
-    d.text((x + w - 66, y + 6), "%", font=font(SANS_B, 44), fill=RED)
+    d.ellipse([x + 8, y + 6, x + 32, y + 30], fill=(250, 196, 90))
+    d.rectangle([x, y + h - 26, x + w, y + h], fill=(120, 140, 70))
+    for fx in range(x + 10, x + w - 6, 26):
+        d.rectangle([fx, y + h - 40, fx + 3, y + h - 24], fill=(96, 72, 40))
+    d.line([(x, y + h - 34), (x + w, y + h - 34)], fill=(96, 72, 40),
+           width=2)
+    # blast cloud rising over the far field
+    for cx, cy, r in ((x + w - 30, y + 22, 12), (x + w - 18, y + 14, 9),
+                      (x + w - 42, y + 14, 8)):
+        puff(d, cx, cy, r, color=(200, 200, 200))
+    d.polygon([(x + w - 38, y + 30), (x + w - 30, y + 18),
+               (x + w - 22, y + 30)], fill=(255, 140, 40))
 
 
-def climate_panel(d, x, y, w, h):
-    """A warming globe under a pale sun: the climate talks."""
-    d.rectangle([x, y, x + w, y + h], fill=(196, 214, 226))
-    d.ellipse([x + w - 66, y + 8, x + w - 26, y + 48], fill=(250, 196, 90))
-    cx, cy = x + w // 2, y + h // 2 + 8
-    d.ellipse([cx - 46, cy - 46, cx + 46, cy + 46], fill=(44, 92, 160))
-    d.ellipse([cx - 30, cy - 30, cx + 6, cy - 6], fill=(70, 120, 80))
-    d.ellipse([cx + 2, cy + 10, cx + 34, cy + 38], fill=(70, 120, 80))
-    d.arc([cx - 46, cy - 46, cx + 46, cy + 46], 200, 340,
-          fill=(120, 170, 220), width=3)
-    d.line([(cx + 52, cy - 52), (cx + 62, cy - 62)], fill=(178, 34, 34),
-           width=4)
-    d.polygon([(cx + 62, cy - 62), (cx + 62, cy - 48), (cx + 48, cy - 62)],
-              fill=(178, 34, 34))
-
-
-PANELS = [
-    ("SUDAN", "RSF drone strikes kill 19 civilians in two cities",
-     "Rights group says 20 more wounded in the attacks.", drone_panel),
-    ("PACIFIC", "Australia signs treaty barring foreign bases",
-     "Solomon Islands pact shuts out any foreign military base.",
-     treaty_panel),
-    ("SPACE", "Pakistani astronaut boards China's space station",
-     "First foreigner aboard Tiangong as Shenzhou-24 docks.",
-     space_panel),
-    ("WASHINGTON", "Huawei guilty of stealing trade secrets",
-     "US jury convicts on trade secrets and bank fraud.", court_panel),
-    ("WASHINGTON", "Trump proposes new tariffs on 14 partners",
-     "Duties target excess factory capacity, China hardest hit.",
-     tariff_panel),
-    ("VATICAN", "Pope warns as COP31 climate talks fail",
-     "No deal reached; extreme weather grows more frequent.",
-     climate_panel),
+ROWS = [
+    ("2 · TECHNOLOGY", "Nvidia brings back Jensen Huang as chief executive",
+     "Twelve days after he resigned; Trump says he may pardon him.",
+     chip_thumb),
+    ("3 · GAZA", "Israel kills Hamas security chief in Gaza",
+     "Mohammad Abuelouf, his wife and two children killed, officials say.",
+     skyline_thumb),
+    ("4 · UNITED STATES", "Abrego Garcia leaves the US for Spain",
+     "A Salvadoran man wrongly deported ends a 20-month legal ordeal.",
+     plane_thumb),
+    ("5 · CUBA", "WHO chief: end the fuel blockade endangering children",
+     "Tedros urges the US to lift a blockade that starves Cuba of fuel.",
+     island_thumb),
+    ("6 · IOWA", "Army detonates its old explosives stockpile",
+     "A controlled blast in Iowa; early air readings show no lead.",
+     field_thumb),
 ]
 
 
@@ -255,81 +286,70 @@ def main():
     img = Image.new("RGB", (W, H), PAPER)
     d = ImageDraw.Draw(img)
 
-    # Masthead
-    d.text((W // 2, 12), "THE WORLD IN ONE DAY", font=font(SERIF_B, 58),
-           fill=INK, anchor="ma")
-    d.text((W // 2, 76), "WEDNESDAY, 25 NOVEMBER 2026",
-           font=font(SANS_B, 26), fill=RED, anchor="ma")
-    rule(d, 20, 108, W - 20, 3)
+    # Masthead band
+    d.rectangle([0, 0, W, 96], fill=NAVY)
+    d.text((W // 2, 10), "A DAY AROUND THE WORLD", font=fnt(SERIF, 44),
+           fill=(255, 255, 255), anchor="ma")
+    d.text((W // 2, 62), "WEDNESDAY, 25 NOVEMBER 2026  ·  SIX STORIES, ONE DAY",
+           font=fnt(SANSB, 19), fill=GOLD, anchor="ma")
 
-    # Lead
-    y = 122
-    d.text((20, y), "RAS TANURA HIT", font=font(SANS_B, 20), fill=RED)
-    y += 30
-    y = text_block(d, 20, y,
-                   "Houthis strike Saudi Arabia's biggest oil refinery "
-                   "\u2014 fires at Ras Tanura",
-                   font(SANS_B, 32), INK, W - 40, 40)
-    y += 8
-    hero_panel = Image.new("RGB", (560, 170), PAPER)
-    hd = ImageDraw.Draw(hero_panel)
-    hero_refinery(hd, 0, 0, 560, 170)
-    img.paste(hero_panel, (20, y))
-    d.rectangle([20, y, 20 + 560, y + 170], outline=INK, width=2)
-    yy = text_block(d, 596, y,
-                    "Yemen's Houthis say they attacked the Ras Tanura "
-                    "refinery, Saudi Arabia's largest, and caused fires.",
-                    font(SANS, 20), INK, 408, 26)
-    text_block(d, 596, yy + 10,
-               "Oil prices climb; Brent nears $95 a barrel.",
-               font(SANS_B, 20), INK, 408, 26)
-    y = y + 170 + 12
-    rule(d, 20, y, W - 20, 2)
-    y += 10
+    # Map band
+    draw_map(d, MARGIN, 108, W - 2 * MARGIN, 148)
+    d.rectangle([MARGIN, 108, W - MARGIN, 256], outline=INK, width=2)
 
-    # Two rows of three story panels. Each panel is drawn on its own
-    # temporary image so no drawing can spill past the panel border
-    # (e.g. the Earth curve in the space panel) into the captions below.
-    col_w, gap = 320, 12
-    x0 = 20
-    panel_h = 96
-    for row in range(2):
-        row_y = y
-        row_bottom = row_y
-        for col in range(3):
-            p = PANELS[row * 3 + col]
-            px = x0 + col * (col_w + gap)
-            panel_img = Image.new("RGB", (col_w, panel_h), PAPER)
-            pd = ImageDraw.Draw(panel_img)
-            p[3](pd, 0, 0, col_w, panel_h)
-            img.paste(panel_img, (px, row_y))
-            d.rectangle([px, row_y, px + col_w, row_y + panel_h],
-                        outline=INK, width=2)
-            ty = row_y + panel_h + 8
-            d.text((px, ty), p[0], font=font(SANS_B, 16), fill=RED)
-            ty += 21
-            ty = text_block(d, px, ty, p[1], font(SANS_B, 21), INK,
-                            col_w, 25)
-            ty = text_block(d, px, ty + 3, p[2], font(SANS, 17), GREY,
-                            col_w, 21)
-            row_bottom = max(row_bottom, ty)
-        y = row_bottom + 10
-        if row == 0:
-            rule(d, 20, y, W - 20, 1)
-            y += 10
+    # Lead story
+    y = 272
+    d.text((MARGIN, y), "1 · UKRAINE — THE LEAD", font=fnt(SANSB, 19),
+           fill=RED)
+    y += 28
+    y = para(d, MARGIN, y,
+             "Ukraine says it destroyed the road span of the Kerch Bridge",
+             fnt(SANSB, 31), INK, W - 2 * MARGIN, 34)
+    y += 4
+    hero = Image.new("RGB", (W - 2 * MARGIN, 150), PAPER)
+    hd = ImageDraw.Draw(hero)
+    bridge_hero(hd, 0, 0, W - 2 * MARGIN, 150)
+    img.paste(hero, (MARGIN, y))
+    d.rectangle([MARGIN, y, W - MARGIN, y + 150], outline=INK, width=2)
+    y += 150 + 8
+    y = para(d, MARGIN, y,
+             "Kyiv says its forces brought down the road deck of the bridge "
+             "linking Russia to occupied Crimea; Moscow says it will rebuild.",
+             fnt(SANS, 19), INK, W - 2 * MARGIN, 25)
+    y += 6
+    hline(d, MARGIN, y, W - MARGIN, 2)
+    y += 12
 
-    # Ticker footer
-    rule(d, 20, y, W - 20, 2)
-    y += 10
-    d.text((20, y), "ALSO TODAY", font=font(SANS_B, 17), fill=RED)
-    text_block(d, 20, y + 24,
-               "Bangladesh raises garment wage 36% to $139 \u00b7 Cairo "
-               "tanker fire kills 31 \u00b7 Nasdaq down 2%, near bear "
-               "market \u00b7 Macy's parade postponed by storm",
-               font(SANS, 17), INK, W - 40, 22)
-    print("layout ends near y =", y + 24 + 44, "of", H)
+    # Five story rows, each with its own drawn picture
+    thumb_w, thumb_h = 118, 62
+    for kicker, headline, summary, draw_fn in ROWS:
+        thumb = Image.new("RGB", (thumb_w, thumb_h), PAPER)
+        td = ImageDraw.Draw(thumb)
+        draw_fn(td, 0, 0, thumb_w, thumb_h)
+        img.paste(thumb, (MARGIN, y))
+        d.rectangle([MARGIN, y, MARGIN + thumb_w, y + thumb_h],
+                    outline=INK, width=2)
+        tx = MARGIN + thumb_w + 14
+        d.text((tx, y - 2), kicker, font=fnt(SANSB, 15), fill=RED)
+        ty = para(d, tx, y + 18, headline, fnt(SANSB, 20), INK,
+                  W - MARGIN - tx, 24)
+        para(d, tx, ty + 2, summary, fnt(SANS, 16), GREY,
+             W - MARGIN - tx, 20)
+        y += 72
+        if kicker != ROWS[-1][0]:
+            hline(d, MARGIN, y - 6, W - MARGIN, 1, color=(180, 180, 175))
 
-    out = os.path.join(HERE, "entry.png")
+    # Ticker strip
+    d.rectangle([0, 966, W, H], fill=NAVY)
+    d.text((MARGIN, 976), "ALSO TODAY", font=fnt(SANSB, 16), fill=GOLD)
+    para(d, 150, 976,
+         "Sullivan concedes Alaska race to Peltola · DOJ charges 800 in a "
+         "global scam crackdown · Hong Kong marks one year since its deadly "
+         "fire · Sinner out after knee surgery",
+         fnt(SANS, 16), (255, 255, 255), W - MARGIN - 150, 20)
+    print("story rows end near y =", y, "of", H)
+
+    out = os.path.join(HERE, "entry-r3.png")
     img.save(out, "PNG", optimize=True)
     print("wrote", out, os.path.getsize(out), "bytes")
 
