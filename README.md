@@ -2,23 +2,23 @@
 [![rank](https://make.fun/badge/news-image-20261125/rinoo9/news-image-20261125/rank.svg)](https://make.fun/bounty/news-image-20261125)
 [![reward](https://make.fun/badge/news-image-20261125/rinoo9/news-image-20261125/reward.svg)](https://make.fun/bounty/news-image-20261125)
 
-# 25 November 2026 — One Day in Pictures
+# 25 November 2026 — One Day in Pictures (Round 2)
 
 A make.fun entry for the [news-image-20261125](https://make.fun/bounty/news-image-20261125) bounty: one image that sums up the world's news of Wednesday 25 November 2026.
 
 ## The image
 
-A newspaper front page, drawn by `compose.py` (Pillow) around a generated photograph of a cargo ship in the Gulf of Finland at dusk — the very ship in the lead story. Every story is the day's news as first reported on Wednesday 25 November 2026, verified against live reporting:
+A newspaper front page, drawn entirely by `compose.py` (Pillow) — including the lead hero panel of the Ras Tanura refinery. Every story is the day's news as first reported on Wednesday 25 November 2026, verified against live reporting:
 
-1. Ukrainian drones struck two Russian vessels — a warship sunk off Benghazi, Libya, and a cargo ship hit in the Gulf of Finland. President Zelenskyy confirmed the strikes; Moscow called them "terrorism" and vowed consequences; Norway urged caution (Reuters; RFE/RL).
-2. Houthi drone hits Riyadh's tallest tower — eleven people wounded, Saudi civil defence says (Reuters).
-3. CIA and spy chief's office hit by cyber breach — unclassified information taken in a breach of the CIA and the Director of National Intelligence, sources say (Reuters).
-4. NATO sends early-warning jets to Poland — surveillance aircraft move east after missiles landed in Poland during an attack on Ukraine.
-5. Iran says three tankers hit by mines — the Revolutionary Guard Navy blames naval mines in the Strait of Hormuz.
-6. Gaza toll reaches 74,746; 266m face hunger — Oxfam warns of pollution across Gaza; the UN food agency says 266 million people face acute food insecurity.
-7. Trump gives Giuliani the Medal of Freedom — the former New York mayor takes the top US civilian honour; Huawei is found guilty of stealing trade secrets in a US trial.
+1. Houthis strike Saudi Arabia's biggest oil refinery — Yemen's Houthis say they attacked the Ras Tanura refinery, Saudi Arabia's largest, and caused fires; oil prices climb, Brent nears $95 a barrel (Just Security; Reuters).
+2. RSF drone strikes kill 19 civilians in two cities in Sudan — rights group Emergency Lawyers says 20 more were wounded (Just Security).
+3. Australia signs treaty barring foreign bases — the Solomon Islands pact shuts out any foreign military base (Just Security).
+4. Pakistani astronaut boards China's space station — the first foreigner aboard Tiangong as Shenzhou-24 docks (Reuters).
+5. Huawei guilty of stealing trade secrets — a US jury convicts on trade secrets and bank fraud, not racketeering (Reuters).
+6. Trump proposes new tariffs on 14 partners — duties target excess factory capacity, China hardest hit (Reuters).
+7. Pope warns as COP31 climate talks fail — no deal reached; extreme weather grows more frequent (AP).
 
-Ticker: BJP and Akali Dal reunite for Punjab 2027 · England beat Australia by eight wickets in the T20 · Fort Hood gunman seeks a stay of execution · France orders the Sarkozy corruption case to trial.
+Ticker: Bangladesh raises garment wage 36% to $139 · Cairo tanker fire kills 31 · Nasdaq down 2%, near bear market · Macy's parade postponed by storm.
 
 ## The program
 
