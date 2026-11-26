@@ -1,38 +1,38 @@
 #!/usr/bin/env python3
-"""Draw the round-3 front image for news-image-20261125 (1024x1024 PNG).
+"""Draw the round-4 front image for news-image-20261125 (1024x1024 PNG).
 
-Form: an atlas spread, not a newspaper grid. A dark masthead, a world
-map band with numbered pins for the six stories, one wide lead picture
-(the Kerch Bridge road span, destroyed), then five story rows, each with
-its own small drawn picture, and a ticker strip at the foot.
+Form: the atlas spread from round 3. A dark masthead, a world map band
+with numbered pins for the six stories, one wide lead picture (Kyiv at
+night, under a missile strike), then five story rows, each with its own
+small drawn picture, and a ticker strip at the foot.
 
-Stories: Wednesday 25 November 2026, none of them used in round 1 or
-round 2 (round 1: Gulf of Finland warship, Riyadh tower, CIA breach,
+Stories: Thursday 26 November 2026, none of them used in round 1, 2
+or 3 (round 1: Gulf of Finland warship, Riyadh tower, CIA breach,
 NATO jets, Hormuz tankers, Gaza toll, Giuliani medal; round 2: Ras
 Tanura, Sudan RSF, Australia treaty, Pakistani astronaut, Huawei,
-Trump tariffs, Pope/COP31).
+Trump tariffs, Pope/COP31; round 3: Kerch Bridge, Nvidia/Huang,
+Abuelouf Gaza, Abrego Garcia, Cuba fuel blockade, Iowa explosives).
 
-  1. UKRAINE (lead) — Ukraine says it destroyed the road span of the
-     Kerch Bridge; Russia says it will rebuild.
-  2. TECHNOLOGY — Nvidia reinstates Jensen Huang as chief executive,
-     twelve days after he resigned; Trump says he may pardon him.
-  3. GAZA — Israel kills Hamas security chief Mohammad Abuelouf, his
-     wife and two children, Gaza officials say.
-  4. UNITED STATES — Kilmar Abrego Garcia leaves the US for Spain,
-     ending a twenty-month legal ordeal.
-  5. CUBA — The WHO chief urges the US to end a fuel blockade that
-     endangers children in Cuba.
-  6. IOWA — The Army detonates its old lead-azide stockpile in a
-     controlled blast; early air readings show no lead.
+  1. KYIV (lead) — Russian ballistic missiles strike Kyiv overnight,
+     hitting a shopping centre; seven people wounded.
+  2. GAZA — Israeli strikes kill nine in Gaza, including the
+     Hamas-appointed deputy education minister Khaled Abu Nada.
+  3. SPACE — The FCC approves SpaceX's plan for up to one million
+     satellites for orbital data centres.
+  4. NORTH KOREA — Pyongyang expels Switzerland's top diplomat and
+     orders its reopened office closed.
+  5. SOUTH AFRICA — A court throws out the report behind the
+     Ramaphosa impeachment push.
+  6. DR CONGO — Ebola cases pass 12,000 in the worst outbreak.
 
-Ticker: Sullivan concedes Alaska race to Peltola; DOJ charges 800 in
-a global scam crackdown; Hong Kong marks one year since its deadly
-fire; Sinner out after knee surgery.
+Ticker: EU leaders meet over a 2 trillion euro budget; king tides
+flood California's coast; memory-chip shortage triples some RAM
+prices; China investigates Shanghai party chief Chen Jining.
 
 Deterministic: fixed geometry, fixed fonts, no randomness, no network,
 no timestamps anywhere in the image.
-Run:  python3 compose-r3.py
-Writes entry-r3.png next to this file.
+Run:  python3 compose-r4.py
+Writes entry-r4.png next to this file.
 """
 import os
 
@@ -124,15 +124,14 @@ def draw_map(d, x, y, w, h):
     d.polygon([(x + 810, y + 126), (x + 890, y + 122), (x + 905, y + 136),
                (x + 870, y + 142), (x + 825, y + 138)], fill=LAND)
     # Story pins, numbered in story order:
-    # 1 Kerch Bridge (Black Sea), 2 California (Nvidia),
-    # 3 Gaza, 4 Madrid (Abrego Garcia to Spain),
-    # 5 Havana (Cuba), 6 Iowa.
-    pin(d, x + 585, y + 44, 1)
-    pin(d, x + 92, y + 56, 2)
-    pin(d, x + 556, y + 62, 3)
-    pin(d, x + 478, y + 44, 4)
-    pin(d, x + 168, y + 78, 5)
-    pin(d, x + 168, y + 44, 6)
+    # 1 Kyiv, 2 Gaza, 3 Washington DC, 4 Pyongyang, 5 Cape Town,
+    # 6 DR Congo (Kinshasa).
+    pin(d, x + 578, y + 38, 1)
+    pin(d, x + 556, y + 62, 2)
+    pin(d, x + 168, y + 56, 3)
+    pin(d, x + 880, y + 40, 4)
+    pin(d, x + 540, y + 118, 5)
+    pin(d, x + 520, y + 88, 6)
     d.text((x + 8, y + h - 22), "WHERE THE DAY HAPPENED",
            font=fnt(SANSB, 15), fill=NAVY)
 
@@ -141,54 +140,54 @@ def puff(d, cx, cy, r, color=(140, 140, 140)):
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
 
 
-def bridge_hero(d, x, y, w, h):
-    """The Kerch Bridge over the strait, its road span broken open."""
-    d.rectangle([x, y, x + w, y + h], fill=(196, 214, 232))
-    d.ellipse([x + w - 110, y + 10, x + w - 40, y + 80],
-              fill=(250, 224, 150))
-    # sea
-    d.rectangle([x, y + h - 46, x + w, y + h], fill=(44, 92, 160))
-    for wx in range(x + 10, x + w, 46):
-        d.arc([wx, y + h - 34, wx + 34, y + h - 20], 180, 360,
-              fill=(120, 170, 220), width=2)
-    # two towers
-    for tx in (x + 250, x + 660):
-        d.rectangle([tx - 8, y + 30, tx + 8, y + h - 46], fill=(96, 104, 118))
-        d.line([(tx, y + 30), (tx - 120, y + h - 46)], fill=(70, 78, 92),
-               width=2)
-        d.line([(tx, y + 30), (tx + 120, y + h - 46)], fill=(70, 78, 92),
-               width=2)
-    # deck, left half and right half, with the middle span gone
-    d.rectangle([x, y + h - 66, x + 430, y + h - 46], fill=(214, 222, 235))
-    d.rectangle([x + 560, y + h - 66, x + w, y + h - 46],
-                fill=(214, 222, 235))
-    # the fallen span, tilted into the water
-    d.polygon([(x + 440, y + h - 62), (x + 545, y + h - 58),
-               (x + 530, y + h - 30), (x + 455, y + h - 26)],
-              fill=(150, 158, 172))
-    # fire and smoke where the span broke
-    d.polygon([(x + 478, y + h - 58), (x + 488, y + h - 96),
-               (x + 498, y + h - 58)], fill=(255, 140, 40))
-    d.polygon([(x + 488, y + h - 58), (x + 494, y + h - 84),
-               (x + 500, y + h - 58)], fill=(255, 196, 60))
-    for cx, cy, r in ((x + 492, y + 34, 15), (x + 508, y + 18, 11),
-                      (x + 476, y + 16, 9), (x + 520, y + 36, 8)):
-        puff(d, cx, cy, r)
-
-
-def chip_thumb(d, x, y, w, h):
-    """A green circuit board with a chip at its centre."""
-    d.rectangle([x, y, x + w, y + h], fill=(24, 96, 60))
-    for gx in range(x + 8, x + w - 8, 18):
-        d.line([(gx, y + 6), (gx, y + h - 6)], fill=(60, 160, 100), width=1)
-    for gy in range(y + 8, y + h - 8, 18):
-        d.line([(x + 6, gy), (x + w - 6, gy)], fill=(60, 160, 100), width=1)
-    cx, cy = x + w // 2, y + h // 2
-    d.rectangle([cx - 26, cy - 18, cx + 26, cy + 18], fill=(30, 34, 40))
-    d.rectangle([cx - 16, cy - 10, cx + 16, cy + 10], fill=(214, 164, 60))
-    for px in range(cx - 20, cx + 21, 10):
-        d.line([(px, cy - 24), (px, cy - 18)], fill=(200, 208, 220), width=2)
-        d.line([(px, cy + 18), (px, cy + 24)], fill=(200, 208, 220), width=2)
+def kyiv_hero(d, x, y, w, h):
+    """Kyiv at night: a dark skyline, a missile trail arcing down, and
+    a blast flash with smoke over a shopping centre."""
+    d.rectangle([x, y, x + w, y + h], fill=(18, 26, 48))
+    for sx, sy in ((x + 60, y + 14), (x + 180, y + 26), (x + 320, y + 10),
+                   (x + 470, y + 22), (x + 620, y + 12), (x + 780, y + 24),
+                   (x + 900, y + 14), (x + 250, y + 40), (x + 560, y + 38)):
+        d.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=(220, 225, 240))
+    # moon
+    d.ellipse([x + w - 120, y + 12, x + w - 70, y + 62],
+              fill=(240, 232, 200))
+    # missile trail arcing down from the upper right
+    for i, (tx, ty) in enumerate(((x + 700, y + 16), (x + 660, y + 34),
+                                  (x + 620, y + 54), (x + 585, y + 76))):
+        d.ellipse([tx - 3, ty - 3, tx + 3, ty + 3],
+                  fill=(255, 200, 90) if i == 3 else (255, 160, 60))
+    # blast flash over the rooftops
+    bx, by = x + 580, y + h - 58
+    d.polygon([(bx, by - 34), (bx + 12, by - 8), (bx + 34, by - 12),
+               (bx + 16, by + 2), (bx + 26, by + 18), (bx, by + 8),
+               (bx - 26, by + 18), (bx - 16, by + 2), (bx - 34, by - 12),
+               (bx - 12, by - 8)], fill=(255, 196, 60))
+    d.polygon([(bx, by - 18), (bx + 7, by - 4), (bx + 18, by - 6),
+               (bx + 9, by + 2), (bx + 14, by + 10), (bx, by + 4),
+               (bx - 14, by + 10), (bx - 9, by + 2), (bx - 18, by - 6),
+               (bx - 7, by - 4)], fill=(255, 120, 30))
+    # smoke rising from the blast
+    for cx, cy, r in ((bx - 6, by - 44, 13), (bx + 10, by - 58, 10),
+                      (bx - 20, by - 56, 8), (bx + 22, by - 40, 7)):
+        puff(d, cx, cy, r, color=(120, 120, 128))
+    # skyline silhouette
+    base = y + h - 40
+    for bx0, bw, bh in ((x + 10, 70, 52), (x + 90, 56, 74), (x + 156, 80, 44),
+                        (x + 246, 60, 88), (x + 316, 72, 58), (x + 398, 64, 80),
+                        (x + 472, 76, 48), (x + 640, 66, 70), (x + 716, 80, 54),
+                        (x + 806, 60, 78), (x + 876, 70, 46)):
+        d.rectangle([bx0, base - bh, bx0 + bw, base], fill=(8, 12, 24))
+        for wy in range(base - bh + 8, base - 6, 12):
+            for wx in range(bx0 + 8, bx0 + bw - 8, 14):
+                d.rectangle([wx, wy, wx + 5, wy + 6], fill=(250, 196, 90))
+    # damaged building: top corner gone, by the blast
+    d.polygon([(x + 472, base - 48), (x + 486, base - 48),
+               (x + 548, base - 34), (x + 548, base), (x + 472, base)],
+              fill=(5, 8, 16))
+    # street
+    d.rectangle([x, base, x + w, y + h], fill=(30, 32, 40))
+    for lx in range(x + 40, x + w, 120):
+        d.line([(lx, base + 22), (lx + 40, base + 22)], fill=GOLD, width=3)
 
 
 def skyline_thumb(d, x, y, w, h):
@@ -209,76 +208,99 @@ def skyline_thumb(d, x, y, w, h):
         puff(d, cx, cy, r)
 
 
-def plane_thumb(d, x, y, w, h):
-    """An airliner crossing a sunset sky over the sea."""
-    d.rectangle([x, y, x + w, y + h], fill=(250, 196, 120))
-    d.ellipse([x + w - 34, y + 6, x + w - 10, y + 30], fill=(250, 240, 200))
-    d.rectangle([x, y + h - 16, x + w, y + h], fill=(44, 92, 160))
-    cx, cy = x + w // 2, y + h // 2
-    d.ellipse([cx - 34, cy - 7, cx + 34, cy + 7], fill=(240, 244, 250))
-    d.polygon([(cx + 26, cy - 6), (cx + 44, cy - 16), (cx + 40, cy - 2)],
-              fill=(200, 208, 220))
-    d.polygon([(cx - 4, cy + 6), (cx + 10, cy + 18), (cx + 16, cy + 6)],
-              fill=(200, 208, 220))
-    d.line([(cx - 40, cy), (cx - 52, cy)], fill=(200, 208, 220), width=3)
-
-
-def island_thumb(d, x, y, w, h):
-    """A Caribbean island: palm, beach, and a fuel drum on the shore."""
-    d.rectangle([x, y, x + w, y + h], fill=(178, 205, 228))
-    d.rectangle([x, y + h - 18, x + w, y + h], fill=(44, 92, 160))
-    for wx in range(x, x + w, 22):
-        d.arc([wx, y + h - 26, wx + 22, y + h - 12], 180, 360,
-              fill=(44, 92, 128), width=2)
-    d.polygon([(x + 18, y + h - 18), (x + 44, y + h - 40),
-               (x + 78, y + h - 40), (x + 100, y + h - 18)],
-              fill=(220, 200, 140))
-    # palm
-    d.line([(x + 52, y + h - 40), (x + 52, y + 14)], fill=(96, 72, 40),
-           width=3)
-    for dx, dy in ((-16, -6), (-12, 4), (16, -6), (12, 4)):
-        d.arc([x + 52 + dx - 10, y + 14 + dy - 6, x + 52 + dx + 10,
-               y + 14 + dy + 6], 0, 180, fill=(60, 120, 60), width=2)
-    # red fuel drum
-    d.rectangle([x + 82, y + h - 34, x + 98, y + h - 18], fill=RED)
-    d.line([(x + 82, y + h - 29), (x + 98, y + h - 29)], fill=(120, 20, 20),
-           width=1)
-
-
-def field_thumb(d, x, y, w, h):
-    """An Iowa field at dawn: fence posts and a blast cloud on the
-    horizon."""
-    d.rectangle([x, y, x + w, y + h], fill=(232, 214, 170))
-    d.ellipse([x + 8, y + 6, x + 32, y + 30], fill=(250, 196, 90))
-    d.rectangle([x, y + h - 26, x + w, y + h], fill=(120, 140, 70))
-    for fx in range(x + 10, x + w - 6, 26):
-        d.rectangle([fx, y + h - 40, fx + 3, y + h - 24], fill=(96, 72, 40))
-    d.line([(x, y + h - 34), (x + w, y + h - 34)], fill=(96, 72, 40),
+def satellite_thumb(d, x, y, w, h):
+    """A satellite with gold panels crossing a starry sky over Earth."""
+    d.rectangle([x, y, x + w, y + h], fill=(12, 18, 40))
+    for sx, sy in ((x + 10, y + 10), (x + 34, y + 22), (x + 70, y + 8),
+                   (x + 96, y + 18), (x + 110, y + 6), (x + 52, y + 30)):
+        d.ellipse([sx - 1, sy - 1, sx + 1, sy + 1], fill=(230, 235, 245))
+    # Earth curve at the foot
+    d.ellipse([x - 30, y + h - 14, x + w + 30, y + h + 40],
+              fill=(44, 92, 160))
+    d.ellipse([x + 18, y + h - 10, x + 52, y + h + 8], fill=(60, 140, 80))
+    # satellite body and panels
+    cx, cy = x + w // 2, y + h // 2 - 4
+    d.rectangle([cx - 34, cy - 6, cx - 10, cy + 6], fill=(214, 164, 60))
+    d.rectangle([cx + 10, cy - 6, cx + 34, cy + 6], fill=(214, 164, 60))
+    d.rectangle([cx - 10, cy - 9, cx + 10, cy + 9], fill=(200, 208, 220))
+    d.ellipse([cx - 4, cy - 4, cx + 4, cy + 4], fill=(24, 44, 78))
+    d.line([(cx + 10, cy - 12), (cx + 22, cy - 22)], fill=(200, 208, 220),
            width=2)
-    # blast cloud rising over the far field
-    for cx, cy, r in ((x + w - 30, y + 22, 12), (x + w - 18, y + 14, 9),
-                      (x + w - 42, y + 14, 8)):
-        puff(d, cx, cy, r, color=(200, 200, 200))
-    d.polygon([(x + w - 38, y + 30), (x + w - 30, y + 18),
-               (x + w - 22, y + 30)], fill=(255, 140, 40))
+    d.ellipse([cx + 20, cy - 24, cx + 24, cy - 20], fill=(255, 196, 60))
+
+
+def embassy_thumb(d, x, y, w, h):
+    """A shuttered embassy: a grey office block, a flag at half-mast,
+    and a closed gate."""
+    d.rectangle([x, y, x + w, y + h], fill=(196, 204, 214))
+    d.rectangle([x + 14, y + 8, x + w - 14, y + h - 14], fill=(120, 128, 140))
+    for wy in range(y + 16, y + h - 20, 12):
+        for wx in range(x + 20, x + w - 20, 16):
+            d.rectangle([wx, wy, wx + 8, wy + 7], fill=(40, 48, 60))
+    # flagpole with a small red flag lowered halfway
+    d.line([(x + 62, y + 4), (x + 62, y + 26)], fill=(240, 244, 250),
+           width=2)
+    d.rectangle([x + 62, y + 12, x + 82, y + 20], fill=RED)
+    # closed gate bars across the foot
+    for gx in range(x + 6, x + w - 6, 10):
+        d.line([(gx, y + h - 12), (gx, y + h - 2)], fill=(30, 34, 40),
+               width=2)
+    d.line([(x, y + h - 12), (x + w, y + h - 12)], fill=(30, 34, 40),
+           width=2)
+
+
+def court_thumb(d, x, y, w, h):
+    """A courthouse front: columns, a pediment, and a gavel's echo in
+    the steps."""
+    d.rectangle([x, y, x + w, y + h], fill=(232, 226, 214))
+    d.polygon([(x + 10, y + 22), (x + w // 2, y + 4), (x + w - 10, y + 22)],
+              fill=(180, 172, 150))
+    for cx in (x + 22, x + 46, x + 70, x + 94):
+        d.rectangle([cx - 4, y + 24, cx + 4, y + h - 14], fill=(250, 248, 240))
+        d.rectangle([cx - 7, y + 22, cx + 7, y + 26], fill=(210, 202, 180))
+        d.rectangle([cx - 7, y + h - 16, cx + 7, y + h - 12],
+                    fill=(210, 202, 180))
+    d.rectangle([x, y + h - 12, x + w, y + h], fill=(150, 142, 122))
+    # scales of justice above the door
+    d.line([(x + w // 2, y + 26), (x + w // 2, y + 34)], fill=(90, 78, 60),
+           width=2)
+    d.line([(x + w // 2 - 10, y + 28), (x + w // 2 + 10, y + 28)],
+           fill=(90, 78, 60), width=2)
+
+
+def clinic_thumb(d, x, y, w, h):
+    """A field clinic tent with a red cross, under a pale sun."""
+    d.rectangle([x, y, x + w, y + h], fill=(238, 228, 200))
+    d.ellipse([x + 8, y + 6, x + 30, y + 28], fill=(250, 196, 90))
+    d.rectangle([x, y + h - 16, x + w, y + h], fill=(120, 140, 70))
+    # tent
+    d.polygon([(x + 24, y + h - 16), (x + 59, y + 18), (x + 94, y + h - 16)],
+              fill=(240, 244, 250))
+    d.polygon([(x + 24, y + h - 16), (x + 59, y + 18), (x + 59, y + h - 16)],
+              fill=(214, 220, 230))
+    d.rectangle([x + 54, y + h - 26, x + 64, y + h - 16], fill=(90, 78, 60))
+    # red cross on the tent
+    d.rectangle([x + 56, y + 30, x + 62, y + 44], fill=RED)
+    d.rectangle([x + 50, y + 35, x + 68, y + 41], fill=RED)
 
 
 ROWS = [
-    ("2 · TECHNOLOGY", "Nvidia brings back Jensen Huang as chief executive",
-     "Twelve days after he resigned; Trump says he may pardon him.",
-     chip_thumb),
-    ("3 · GAZA", "Israel kills Hamas security chief in Gaza",
-     "Mohammad Abuelouf, his wife and two children killed, officials say.",
+    ("2 · GAZA", "Israeli strikes kill nine in Gaza, deputy minister dead",
+     "Khaled Abu Nada, the Hamas-appointed deputy education minister, "
+     "killed in Deir al-Balah.",
      skyline_thumb),
-    ("4 · UNITED STATES", "Abrego Garcia leaves the US for Spain",
-     "A Salvadoran man wrongly deported ends a 20-month legal ordeal.",
-     plane_thumb),
-    ("5 · CUBA", "WHO chief: end the fuel blockade endangering children",
-     "Tedros urges the US to lift a blockade that starves Cuba of fuel.",
-     island_thumb),
-    ("6 · IOWA", "Army detonates its old explosives stockpile",
-     "A controlled blast in Iowa; early air readings show no lead.",
-     field_thumb),
+    ("3 · SPACE", "FCC clears SpaceX plan for a million satellites",
+     "Orbital data centres get the go-ahead in Washington.",
+     satellite_thumb),
+    ("4 · NORTH KOREA", "Pyongyang expels Swiss envoy, shuts reopened office",
+     "Five weeks after the mission resumed, North Korea orders it closed.",
+     embassy_thumb),
+    ("5 · SOUTH AFRICA", "Court throws out report behind Ramaphosa push",
+     "Judges reject the case that fuelled calls to remove the president.",
+     court_thumb),
+    ("6 · DR CONGO", "Ebola cases pass 12,000 in worst outbreak",
+     "Health officials warn the epidemic is still accelerating.",
+     clinic_thumb),
 ]
 
 
@@ -290,7 +312,7 @@ def main():
     d.rectangle([0, 0, W, 96], fill=NAVY)
     d.text((W // 2, 10), "A DAY AROUND THE WORLD", font=fnt(SERIF, 44),
            fill=(255, 255, 255), anchor="ma")
-    d.text((W // 2, 62), "WEDNESDAY, 25 NOVEMBER 2026  ·  SIX STORIES, ONE DAY",
+    d.text((W // 2, 62), "THURSDAY, 26 NOVEMBER 2026  ·  SIX STORIES, ONE DAY",
            font=fnt(SANSB, 19), fill=GOLD, anchor="ma")
 
     # Map band
@@ -299,22 +321,22 @@ def main():
 
     # Lead story
     y = 272
-    d.text((MARGIN, y), "1 · UKRAINE — THE LEAD", font=fnt(SANSB, 19),
+    d.text((MARGIN, y), "1 · KYIV — THE LEAD", font=fnt(SANSB, 19),
            fill=RED)
     y += 28
     y = para(d, MARGIN, y,
-             "Ukraine says it destroyed the road span of the Kerch Bridge",
+             "Russian missiles hit Kyiv overnight; seven wounded",
              fnt(SANSB, 31), INK, W - 2 * MARGIN, 34)
     y += 4
     hero = Image.new("RGB", (W - 2 * MARGIN, 150), PAPER)
     hd = ImageDraw.Draw(hero)
-    bridge_hero(hd, 0, 0, W - 2 * MARGIN, 150)
+    kyiv_hero(hd, 0, 0, W - 2 * MARGIN, 150)
     img.paste(hero, (MARGIN, y))
     d.rectangle([MARGIN, y, W - MARGIN, y + 150], outline=INK, width=2)
     y += 150 + 8
     y = para(d, MARGIN, y,
-             "Kyiv says its forces brought down the road deck of the bridge "
-             "linking Russia to occupied Crimea; Moscow says it will rebuild.",
+             "Ballistic missiles struck a shopping centre in the capital's "
+             "Desnianskyi district; the mayor says seven people were hurt.",
              fnt(SANS, 19), INK, W - 2 * MARGIN, 25)
     y += 6
     hline(d, MARGIN, y, W - MARGIN, 2)
@@ -343,13 +365,13 @@ def main():
     d.rectangle([0, 966, W, H], fill=NAVY)
     d.text((MARGIN, 976), "ALSO TODAY", font=fnt(SANSB, 16), fill=GOLD)
     para(d, 150, 976,
-         "Sullivan concedes Alaska race to Peltola · DOJ charges 800 in a "
-         "global scam crackdown · Hong Kong marks one year since its deadly "
-         "fire · Sinner out after knee surgery",
+         "EU leaders meet over a 2 trillion euro budget · King tides flood "
+         "California's coast · Memory-chip shortage triples some RAM prices "
+         "· China investigates Shanghai party chief Chen Jining",
          fnt(SANS, 16), (255, 255, 255), W - MARGIN - 150, 20)
     print("story rows end near y =", y, "of", H)
 
-    out = os.path.join(HERE, "entry-r3.png")
+    out = os.path.join(HERE, "entry-r4.png")
     img.save(out, "PNG", optimize=True)
     print("wrote", out, os.path.getsize(out), "bytes")
 

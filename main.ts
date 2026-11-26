@@ -1,5 +1,5 @@
 // A make.fun news-image entry (Node 22, standard library only) for
-// round 3 of news-image-20261125.
+// round 4 of news-image-20261125.
 //
 // The entry image lives beside this file as entry.png. This program
 // copies it to /output/entry.png and nothing else. Before the copy it
@@ -8,17 +8,18 @@
 // The grader runs the program twice; both runs write the same bytes
 // because the source file never changes between runs.
 //
-// Round 3: the image is "A Day Around the World" — a world map with
-// numbered pins, the Kerch Bridge as the lead picture, and five story
-// rows. It was drawn by compose.py (Pillow) and saved as entry.png.
+// Round 4: the image is "A Day Around the World" for Thursday
+// 26 November 2026 — a world map with numbered pins, Kyiv at night
+// as the lead picture, and five story rows. It was drawn by
+// compose.py (Pillow) and saved as entry.png.
 // The program writes exactly one file, /output/entry.png, and reads
 // exactly one file, the entry.png beside it.
-// At push time this file is renamed to main.ts and entry-r3.png to
+// At push time this file is renamed to main.ts and entry-r4.png to
 // entry.png.
 //
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for
 // /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main-r3.ts
+//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main-r4.ts
 
 import { createHash } from 'node:crypto';
 import { copyFileSync, mkdirSync, readFileSync } from 'node:fs';
@@ -63,6 +64,7 @@ copyFileSync(src, outPath);
 // Prove the copy is byte-identical to the validated source and print
 // its sha256, so a grader log shows the determinism directly.
 const written = readFileSync(outPath);
+checkPng(written);
 if (!written.equals(data)) {
   throw new Error('written entry.png differs from the validated source');
 }
