@@ -1,38 +1,42 @@
 #!/usr/bin/env python3
-"""Draw the round-4 front image for news-image-20261125 (1024x1024 PNG).
+"""Draw the round-5 front image for news-image-20261125 (1024x1024 PNG).
 
-Form: the atlas spread from round 3. A dark masthead, a world map band
-with numbered pins for the six stories, one wide lead picture (Kyiv at
-night, under a missile strike), then five story rows, each with its own
-small drawn picture, and a ticker strip at the foot.
+Form: the atlas spread from rounds 3 and 4. A dark masthead, a world map
+band with numbered pins for the six stories, one wide lead picture
+(Bangkok refinery fire at night), then five story rows, each with its
+own small drawn picture, and a ticker strip at the foot.
 
-Stories: Thursday 26 November 2026, none of them used in round 1, 2
-or 3 (round 1: Gulf of Finland warship, Riyadh tower, CIA breach,
+Stories: Friday 27 November 2026, none of them used in round 1, 2, 3
+or 4 (round 1: Gulf of Finland warship, Riyadh tower, CIA breach,
 NATO jets, Hormuz tankers, Gaza toll, Giuliani medal; round 2: Ras
 Tanura, Sudan RSF, Australia treaty, Pakistani astronaut, Huawei,
 Trump tariffs, Pope/COP31; round 3: Kerch Bridge, Nvidia/Huang,
-Abuelouf Gaza, Abrego Garcia, Cuba fuel blockade, Iowa explosives).
+Abuelouf Gaza, Abrego Garcia, Cuba fuel blockade, Iowa explosives;
+round 4: Kyiv missiles, Gaza Abu Nada, FCC SpaceX Starmind, North
+Korea expels Swiss diplomat, Ramaphosa impeachment report, DR Congo
+Ebola 12,000).
 
-  1. KYIV (lead) — Russian ballistic missiles strike Kyiv overnight,
-     hitting a shopping centre; seven people wounded.
-  2. GAZA — Israeli strikes kill nine in Gaza, including the
-     Hamas-appointed deputy education minister Khaled Abu Nada.
-  3. SPACE — The FCC approves SpaceX's plan for up to one million
-     satellites for orbital data centres.
-  4. NORTH KOREA — Pyongyang expels Switzerland's top diplomat and
-     orders its reopened office closed.
-  5. SOUTH AFRICA — A court throws out the report behind the
-     Ramaphosa impeachment push.
-  6. DR CONGO — Ebola cases pass 12,000 in the worst outbreak.
+  1. BANGKOK (lead) — Massive fire at a Bangkok oil refinery; several
+     people injured, Bangchak Corp shuts all units.
+  2. USA — A Thanksgiving storm disrupts the North West; NYC postpones
+     the 100th Macy's parade, 500,000+ lose power, flights cancelled.
+  3. NEW ZEALAND — Final election results: coalition holds a slim
+     67-of-131 majority after ~400,000 special votes counted.
+  4. INDONESIA — Rescue teams search for workers trapped in an illegal
+     gold mine.
+  5. CHESS — World Chess Championship Game 3: Gukesh vs Sindarov, a
+     marathon draw, nothing separates them after three games.
+  6. CRICKET — India's 17-year-old Vaibhav Sooryavanshi smashes an
+     unbeaten 204 off 53 balls vs the UAE in the Asia Cup Rising Stars.
 
-Ticker: EU leaders meet over a 2 trillion euro budget; king tides
-flood California's coast; memory-chip shortage triples some RAM
-prices; China investigates Shanghai party chief Chen Jining.
+Ticker: Saudi Arabia intercepts two Houthi missiles aimed at Riyadh;
+Karachi building collapse kills three; Bank of Korea lifts rates on the
+AI chip boom; Flipkart CEO Kalyan Krishnamurthy to step down.
 
 Deterministic: fixed geometry, fixed fonts, no randomness, no network,
 no timestamps anywhere in the image.
-Run:  python3 compose-r4.py
-Writes entry-r4.png next to this file.
+Run:  python3 compose-r5.py
+Writes entry-r5.png next to this file.
 """
 import os
 
@@ -124,14 +128,14 @@ def draw_map(d, x, y, w, h):
     d.polygon([(x + 810, y + 126), (x + 890, y + 122), (x + 905, y + 136),
                (x + 870, y + 142), (x + 825, y + 138)], fill=LAND)
     # Story pins, numbered in story order:
-    # 1 Kyiv, 2 Gaza, 3 Washington DC, 4 Pyongyang, 5 Cape Town,
-    # 6 DR Congo (Kinshasa).
-    pin(d, x + 578, y + 38, 1)
-    pin(d, x + 556, y + 62, 2)
-    pin(d, x + 168, y + 56, 3)
-    pin(d, x + 880, y + 40, 4)
-    pin(d, x + 540, y + 118, 5)
-    pin(d, x + 520, y + 88, 6)
+    # 1 Bangkok, 2 New York, 3 Wellington, 4 Jakarta,
+    # 5 India (Gukesh), 6 Doha.
+    pin(d, x + 800, y + 60, 1)
+    pin(d, x + 150, y + 40, 2)
+    pin(d, x + 925, y + 132, 3)
+    pin(d, x + 835, y + 88, 4)
+    pin(d, x + 700, y + 52, 5)
+    pin(d, x + 645, y + 58, 6)
     d.text((x + 8, y + h - 22), "WHERE THE DAY HAPPENED",
            font=fnt(SANSB, 15), fill=NAVY)
 
@@ -140,10 +144,11 @@ def puff(d, cx, cy, r, color=(140, 140, 140)):
     d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=color)
 
 
-def kyiv_hero(d, x, y, w, h):
-    """Kyiv at night: a dark skyline, a missile trail arcing down, and
-    a blast flash with smoke over a shopping centre."""
-    d.rectangle([x, y, x + w, y + h], fill=(18, 26, 48))
+def bangkok_hero(d, x, y, w, h):
+    """Bangkok refinery at night: storage tanks and distillation columns
+    against a dark sky, flames leaping from a ruptured tank, and thick
+    black smoke rolling over the plant."""
+    d.rectangle([x, y, x + w, y + h], fill=(16, 20, 36))
     for sx, sy in ((x + 60, y + 14), (x + 180, y + 26), (x + 320, y + 10),
                    (x + 470, y + 22), (x + 620, y + 12), (x + 780, y + 24),
                    (x + 900, y + 14), (x + 250, y + 40), (x + 560, y + 38)):
@@ -151,156 +156,188 @@ def kyiv_hero(d, x, y, w, h):
     # moon
     d.ellipse([x + w - 120, y + 12, x + w - 70, y + 62],
               fill=(240, 232, 200))
-    # missile trail arcing down from the upper right
-    for i, (tx, ty) in enumerate(((x + 700, y + 16), (x + 660, y + 34),
-                                  (x + 620, y + 54), (x + 585, y + 76))):
-        d.ellipse([tx - 3, ty - 3, tx + 3, ty + 3],
-                  fill=(255, 200, 90) if i == 3 else (255, 160, 60))
-    # blast flash over the rooftops
-    bx, by = x + 580, y + h - 58
-    d.polygon([(bx, by - 34), (bx + 12, by - 8), (bx + 34, by - 12),
-               (bx + 16, by + 2), (bx + 26, by + 18), (bx, by + 8),
-               (bx - 26, by + 18), (bx - 16, by + 2), (bx - 34, by - 12),
-               (bx - 12, by - 8)], fill=(255, 196, 60))
-    d.polygon([(bx, by - 18), (bx + 7, by - 4), (bx + 18, by - 6),
-               (bx + 9, by + 2), (bx + 14, by + 10), (bx, by + 4),
-               (bx - 14, by + 10), (bx - 9, by + 2), (bx - 18, by - 6),
-               (bx - 7, by - 4)], fill=(255, 120, 30))
-    # smoke rising from the blast
-    for cx, cy, r in ((bx - 6, by - 44, 13), (bx + 10, by - 58, 10),
-                      (bx - 20, by - 56, 8), (bx + 22, by - 40, 7)):
-        puff(d, cx, cy, r, color=(120, 120, 128))
-    # skyline silhouette
+    # storage tanks along the ground
     base = y + h - 40
-    for bx0, bw, bh in ((x + 10, 70, 52), (x + 90, 56, 74), (x + 156, 80, 44),
-                        (x + 246, 60, 88), (x + 316, 72, 58), (x + 398, 64, 80),
-                        (x + 472, 76, 48), (x + 640, 66, 70), (x + 716, 80, 54),
-                        (x + 806, 60, 78), (x + 876, 70, 46)):
-        d.rectangle([bx0, base - bh, bx0 + bw, base], fill=(8, 12, 24))
-        for wy in range(base - bh + 8, base - 6, 12):
-            for wx in range(bx0 + 8, bx0 + bw - 8, 14):
-                d.rectangle([wx, wy, wx + 5, wy + 6], fill=(250, 196, 90))
-    # damaged building: top corner gone, by the blast
-    d.polygon([(x + 472, base - 48), (x + 486, base - 48),
-               (x + 548, base - 34), (x + 548, base), (x + 472, base)],
-              fill=(5, 8, 16))
-    # street
-    d.rectangle([x, base, x + w, y + h], fill=(30, 32, 40))
+    for tx0, tw in ((x + 10, 110), (x + 140, 96), (x + 256, 120),
+                    (x + 640, 110), (x + 770, 100), (x + 886, 88)):
+        d.ellipse([tx0, base - 52, tx0 + tw, base - 30], fill=(70, 76, 88))
+        d.rectangle([tx0, base - 42, tx0 + tw, base], fill=(52, 58, 70))
+        d.rectangle([tx0, base - 42, tx0 + tw, base - 36], fill=(88, 94, 108))
+    # distillation columns
+    for cx0 in (x + 400, x + 430, x + 460):
+        d.rectangle([cx0, base - 96, cx0 + 16, base], fill=(64, 70, 84))
+        d.line([(cx0, base - 80), (cx0 + 16, base - 80)], fill=(88, 94, 108),
+               width=2)
+        d.line([(cx0, base - 60), (cx0 + 16, base - 60)], fill=(88, 94, 108),
+               width=2)
+    # flames leaping from the ruptured middle tank
+    fx = x + 316
+    d.polygon([(fx - 34, base), (fx - 18, base - 66), (fx - 4, base - 30),
+               (fx + 8, base - 78), (fx + 22, base - 34), (fx + 34, base)],
+              fill=(255, 140, 30))
+    d.polygon([(fx - 18, base), (fx - 8, base - 44), (fx + 2, base - 18),
+               (fx + 12, base - 52), (fx + 20, base)],
+              fill=(255, 196, 60))
+    # thick black smoke rolling over the plant
+    for cx, cy, r in ((fx - 10, base - 88, 16), (fx + 14, base - 104, 13),
+                      (fx - 30, base - 100, 10), (fx + 34, base - 86, 9),
+                      (fx + 4, base - 120, 8)):
+        puff(d, cx, cy, r, color=(38, 38, 44))
+    # ground glow and fire-engine lights
+    d.rectangle([x, base, x + w, y + h], fill=(28, 26, 30))
     for lx in range(x + 40, x + w, 120):
         d.line([(lx, base + 22), (lx + 40, base + 22)], fill=GOLD, width=3)
+    d.rectangle([x + 700, base + 6, x + 760, base + 26], fill=(178, 34, 34))
+    d.rectangle([x + 712, base + 12, x + 722, base + 20], fill=(255, 196, 60))
 
 
-def skyline_thumb(d, x, y, w, h):
-    """A city skyline at dusk, one building damaged, smoke rising."""
-    d.rectangle([x, y, x + w, y + h], fill=(214, 150, 110))
-    d.rectangle([x, y + h - 12, x + w, y + h], fill=(60, 52, 48))
-    for bx, bw, bh in ((x + 6, 26, 34), (x + 36, 22, 48), (x + 62, 26, 30),
-                       (x + 92, 22, 42)):
-        d.rectangle([bx, y + h - 12 - bh, bx + bw, y + h - 12],
-                    fill=(90, 78, 72))
-        for wy in range(y + h - 12 - bh + 6, y + h - 16, 10):
-            d.rectangle([bx + 5, wy, bx + 11, wy + 5], fill=(250, 196, 90))
-    # damaged building: top corner missing, smoke above it
-    d.polygon([(x + 62, y + h - 12 - 30), (x + 74, y + h - 12 - 30),
-               (x + 88, y + h - 12 - 18), (x + 88, y + h - 12),
-               (x + 62, y + h - 12)], fill=(70, 60, 54))
-    for cx, cy, r in ((x + 76, y + 12, 8), (x + 84, y + 6, 6)):
-        puff(d, cx, cy, r)
-
-
-def satellite_thumb(d, x, y, w, h):
-    """A satellite with gold panels crossing a starry sky over Earth."""
-    d.rectangle([x, y, x + w, y + h], fill=(12, 18, 40))
-    for sx, sy in ((x + 10, y + 10), (x + 34, y + 22), (x + 70, y + 8),
-                   (x + 96, y + 18), (x + 110, y + 6), (x + 52, y + 30)):
-        d.ellipse([sx - 1, sy - 1, sx + 1, sy + 1], fill=(230, 235, 245))
-    # Earth curve at the foot
-    d.ellipse([x - 30, y + h - 14, x + w + 30, y + h + 40],
-              fill=(44, 92, 160))
-    d.ellipse([x + 18, y + h - 10, x + 52, y + h + 8], fill=(60, 140, 80))
-    # satellite body and panels
-    cx, cy = x + w // 2, y + h // 2 - 4
-    d.rectangle([cx - 34, cy - 6, cx - 10, cy + 6], fill=(214, 164, 60))
-    d.rectangle([cx + 10, cy - 6, cx + 34, cy + 6], fill=(214, 164, 60))
-    d.rectangle([cx - 10, cy - 9, cx + 10, cy + 9], fill=(200, 208, 220))
-    d.ellipse([cx - 4, cy - 4, cx + 4, cy + 4], fill=(24, 44, 78))
-    d.line([(cx + 10, cy - 12), (cx + 22, cy - 22)], fill=(200, 208, 220),
-           width=2)
-    d.ellipse([cx + 20, cy - 24, cx + 24, cy - 20], fill=(255, 196, 60))
-
-
-def embassy_thumb(d, x, y, w, h):
-    """A shuttered embassy: a grey office block, a flag at half-mast,
-    and a closed gate."""
-    d.rectangle([x, y, x + w, y + h], fill=(196, 204, 214))
-    d.rectangle([x + 14, y + 8, x + w - 14, y + h - 14], fill=(120, 128, 140))
-    for wy in range(y + 16, y + h - 20, 12):
-        for wx in range(x + 20, x + w - 20, 16):
-            d.rectangle([wx, wy, wx + 8, wy + 7], fill=(40, 48, 60))
-    # flagpole with a small red flag lowered halfway
-    d.line([(x + 62, y + 4), (x + 62, y + 26)], fill=(240, 244, 250),
-           width=2)
-    d.rectangle([x + 62, y + 12, x + 82, y + 20], fill=RED)
-    # closed gate bars across the foot
-    for gx in range(x + 6, x + w - 6, 10):
-        d.line([(gx, y + h - 12), (gx, y + h - 2)], fill=(30, 34, 40),
+def storm_thumb(d, x, y, w, h):
+    """A Thanksgiving storm: black clouds, slanting rain, a bent tree,
+    and a fallen power line over a dark house."""
+    d.rectangle([x, y, x + w, y + h], fill=(52, 58, 74))
+    for cx, cy, r in ((x + 24, y + 12, 14), (x + 52, y + 8, 17),
+                      (x + 84, y + 14, 13), (x + 104, y + 10, 9)):
+        puff(d, cx, cy, r, color=(30, 34, 46))
+    # slanting rain
+    for rx in range(x + 6, x + w - 4, 12):
+        d.line([(rx, y + 28), (rx - 5, y + 44)], fill=(168, 198, 224),
                width=2)
-    d.line([(x, y + h - 12), (x + w, y + h - 12)], fill=(30, 34, 40),
+    # dark house with one lit window
+    d.rectangle([x + 8, y + h - 22, x + 44, y + h - 4], fill=(24, 26, 34))
+    d.polygon([(x + 6, y + h - 22), (x + 26, y + h - 34),
+               (x + 46, y + h - 22)], fill=(18, 20, 28))
+    d.rectangle([x + 20, y + h - 16, x + 28, y + h - 8], fill=(250, 196, 90))
+    # bent tree and fallen power line
+    d.line([(x + 70, y + h - 4), (x + 82, y + h - 30)], fill=(40, 52, 30),
+           width=3)
+    d.line([(x + 82, y + h - 30), (x + 96, y + h - 22)], fill=(40, 52, 30),
+           width=2)
+    d.line([(x + 60, y + h - 34), (x + 110, y + h - 26)], fill=(200, 208, 220),
+           width=2)
+    d.line([(x + 88, y + h - 30), (x + 92, y + h - 8)], fill=(200, 208, 220),
            width=2)
 
 
-def court_thumb(d, x, y, w, h):
-    """A courthouse front: columns, a pediment, and a gavel's echo in
-    the steps."""
-    d.rectangle([x, y, x + w, y + h], fill=(232, 226, 214))
-    d.polygon([(x + 10, y + 22), (x + w // 2, y + 4), (x + w - 10, y + 22)],
-              fill=(180, 172, 150))
-    for cx in (x + 22, x + 46, x + 70, x + 94):
-        d.rectangle([cx - 4, y + 24, cx + 4, y + h - 14], fill=(250, 248, 240))
-        d.rectangle([cx - 7, y + 22, cx + 7, y + 26], fill=(210, 202, 180))
-        d.rectangle([cx - 7, y + h - 16, cx + 7, y + h - 12],
-                    fill=(210, 202, 180))
-    d.rectangle([x, y + h - 12, x + w, y + h], fill=(150, 142, 122))
-    # scales of justice above the door
-    d.line([(x + w // 2, y + 26), (x + w // 2, y + 34)], fill=(90, 78, 60),
+def ballot_thumb(d, x, y, w, h):
+    """A ballot box with a paper going in, and a parliament dome behind
+    it under a pale sky."""
+    d.rectangle([x, y, x + w, y + h], fill=(214, 224, 236))
+    # parliament dome
+    d.ellipse([x + 74, y + 6, x + 110, y + 34], fill=(120, 128, 140))
+    d.rectangle([x + 70, y + 30, x + w - 4, y + h - 8], fill=(148, 156, 168))
+    for wx in range(x + 76, x + w - 10, 12):
+        d.rectangle([wx, y + 38, wx + 6, y + 48], fill=(40, 48, 60))
+    # ballot box
+    d.rectangle([x + 8, y + h - 30, x + 56, y + h - 6], fill=(24, 44, 78))
+    d.rectangle([x + 6, y + h - 34, x + 58, y + h - 28], fill=(36, 58, 96))
+    d.line([(x + 26, y + h - 31), (x + 38, y + h - 31)], fill=(250, 246, 236),
            width=2)
-    d.line([(x + w // 2 - 10, y + 28), (x + w // 2 + 10, y + 28)],
-           fill=(90, 78, 60), width=2)
+    # paper sliding into the slot, with a tick
+    d.polygon([(x + 24, y + 10), (x + 40, y + 8), (x + 38, y + h - 30),
+               (x + 26, y + h - 30)], fill=(250, 248, 240))
+    d.line([(x + 28, y + 18), (x + 32, y + 22), (x + 38, y + 14)],
+           fill=RED, width=2)
 
 
-def clinic_thumb(d, x, y, w, h):
-    """A field clinic tent with a red cross, under a pale sun."""
-    d.rectangle([x, y, x + w, y + h], fill=(238, 228, 200))
-    d.ellipse([x + 8, y + 6, x + 30, y + 28], fill=(250, 196, 90))
-    d.rectangle([x, y + h - 16, x + w, y + h], fill=(120, 140, 70))
-    # tent
-    d.polygon([(x + 24, y + h - 16), (x + 59, y + 18), (x + 94, y + h - 16)],
-              fill=(240, 244, 250))
-    d.polygon([(x + 24, y + h - 16), (x + 59, y + 18), (x + 59, y + h - 16)],
-              fill=(214, 220, 230))
-    d.rectangle([x + 54, y + h - 26, x + 64, y + h - 16], fill=(90, 78, 60))
-    # red cross on the tent
-    d.rectangle([x + 56, y + 30, x + 62, y + 44], fill=RED)
-    d.rectangle([x + 50, y + 35, x + 68, y + 41], fill=RED)
+def mine_thumb(d, x, y, w, h):
+    """A mine headframe tower over a dark shaft mouth, with a rescuer's
+    lamp glowing at the entrance."""
+    d.rectangle([x, y, x + w, y + h], fill=(222, 210, 180))
+    d.rectangle([x, y + h - 10, x + w, y + h], fill=(96, 84, 66))
+    # headframe: two legs and a crossbeam with a wheel on top
+    d.line([(x + 44, y + h - 10), (x + 54, y + 8)], fill=(60, 52, 44),
+           width=4)
+    d.line([(x + 74, y + h - 10), (x + 64, y + 8)], fill=(60, 52, 44),
+           width=4)
+    d.line([(x + 46, y + 20), (x + 72, y + 20)], fill=(60, 52, 44), width=3)
+    d.ellipse([x + 52, y + 2, x + 66, y + 16], fill=(40, 36, 30))
+    d.line([(x + 59, y + 9), (x + 59, y + h - 10)], fill=(40, 36, 30),
+           width=2)
+    # shaft mouth: a black arch in the hillside
+    d.pieslice([x + 82, y + h - 34, x + 112, y + h - 4], 180, 360,
+               fill=(16, 14, 12))
+    d.rectangle([x + 82, y + h - 20, x + 112, y + h - 10], fill=(16, 14, 12))
+    # rescuer's lamp glowing at the entrance
+    d.ellipse([x + 92, y + h - 16, x + 102, y + h - 6], fill=(255, 196, 60))
+    d.ellipse([x + 95, y + h - 13, x + 99, y + h - 9], fill=(255, 240, 180))
+
+
+def chess_thumb(d, x, y, w, h):
+    """A chessboard mid-game: a white king and a black queen facing off,
+    with a clock ticking at the side."""
+    d.rectangle([x, y, x + w, y + h], fill=(232, 222, 196))
+    # 4x4 board
+    sq = 12
+    ox, oy = x + 6, y + 8
+    for r in range(4):
+        for c in range(4):
+            fill = (250, 246, 236) if (r + c) % 2 == 0 else (60, 52, 44)
+            d.rectangle([ox + c * sq, oy + r * sq,
+                         ox + (c + 1) * sq, oy + (r + 1) * sq], fill=fill)
+    # white king on the light square
+    kx, ky = ox + 6, oy + 6
+    d.rectangle([kx + 3, ky + 8, kx + 9, ky + 16], fill=(250, 248, 240))
+    d.ellipse([kx + 2, ky + 1, kx + 10, ky + 9], fill=(250, 248, 240))
+    d.rectangle([kx + 5, ky - 1, kx + 7, ky + 3], fill=(250, 248, 240))
+    # black queen opposite
+    qx, qy = ox + 30, oy + 30
+    d.rectangle([qx + 3, qy + 8, qx + 9, qy + 16], fill=(24, 22, 20))
+    d.ellipse([qx + 2, qy + 1, qx + 10, qy + 9], fill=(24, 22, 20))
+    d.polygon([(qx + 2, qy + 2), (qx + 6, qy - 3), (qx + 10, qy + 2)],
+              fill=(24, 22, 20))
+    # clock at the side
+    d.ellipse([x + w - 26, y + 8, x + w - 6, y + 28], fill=(250, 248, 240))
+    d.ellipse([x + w - 24, y + 10, x + w - 8, y + 26], fill=(24, 44, 78))
+    d.line([(x + w - 16, y + 18), (x + w - 16, y + 12)], fill=GOLD, width=2)
+    d.line([(x + w - 16, y + 18), (x + w - 11, y + 18)], fill=GOLD, width=2)
+
+
+def cricket_thumb(d, x, y, w, h):
+    """A cricket pitch at dusk: a batsman mid-swing, the stumps behind
+    him, and a red ball flying to the boundary."""
+    d.rectangle([x, y, x + w, y + h], fill=(120, 168, 90))
+    d.rectangle([x, y + h - 14, x + w, y + h], fill=(96, 140, 70))
+    # the pitch strip
+    d.rectangle([x + 20, y + 8, x + w - 20, y + h - 14], fill=(214, 196, 150))
+    # stumps at the far end
+    for sx in (x + 52, x + 58, x + 64):
+        d.line([(sx, y + 12), (sx, y + 26)], fill=(250, 240, 200), width=2)
+    d.line([(x + 52, y + 12), (x + 66, y + 12)], fill=(250, 240, 200),
+           width=2)
+    # batsman mid-swing: body, bat, and helmet
+    d.ellipse([x + 78, y + 22, x + 90, y + 34], fill=(24, 44, 78))
+    d.rectangle([x + 78, y + 34, x + 90, y + h - 14], fill=(250, 248, 240))
+    d.line([(x + 88, y + 30), (x + 104, y + 16)], fill=(150, 110, 60),
+           width=4)
+    d.line([(x + 80, y + 44), (x + 66, y + h - 14)], fill=(24, 44, 78),
+           width=3)
+    d.line([(x + 88, y + 44), (x + 98, y + h - 14)], fill=(24, 44, 78),
+           width=3)
+    # red ball flying to the boundary
+    d.ellipse([x + w - 16, y + 8, x + w - 6, y + 18], fill=RED)
+    d.arc([x + w - 24, y + 2, x + w - 2, y + 24], 300, 60, fill=RED,
+          width=2)
 
 
 ROWS = [
-    ("2 · GAZA", "Israeli strikes kill nine in Gaza, deputy minister dead",
-     "Khaled Abu Nada, the Hamas-appointed deputy education minister, "
-     "killed in Deir al-Balah.",
-     skyline_thumb),
-    ("3 · SPACE", "FCC clears SpaceX plan for a million satellites",
-     "Orbital data centres get the go-ahead in Washington.",
-     satellite_thumb),
-    ("4 · NORTH KOREA", "Pyongyang expels Swiss envoy, shuts reopened office",
-     "Five weeks after the mission resumed, North Korea orders it closed.",
-     embassy_thumb),
-    ("5 · SOUTH AFRICA", "Court throws out report behind Ramaphosa push",
-     "Judges reject the case that fuelled calls to remove the president.",
-     court_thumb),
-    ("6 · DR CONGO", "Ebola cases pass 12,000 in worst outbreak",
-     "Health officials warn the epidemic is still accelerating.",
-     clinic_thumb),
+    ("2 · USA", "Thanksgiving storm halts the parade, cuts power to 500,000+",
+     "New York postpones its 100th parade for the first time as a huge "
+     "storm cancels hundreds of flights.",
+     storm_thumb),
+    ("3 · NEW ZEALAND", "Final count gives coalition a slim 67-of-131 majority",
+     "Roughly 400,000 special votes are counted; a hung parliament is "
+     "still possible.",
+     ballot_thumb),
+    ("4 · INDONESIA", "Rescue search for workers trapped in illegal gold mine",
+     "Teams work around the clock at the collapsed mine site.",
+     mine_thumb),
+    ("5 · CHESS", "Gukesh vs Sindarov: marathon draw in Game 3",
+     "The longest game of the series so far leaves nothing between "
+     "them after three games.",
+     chess_thumb),
+    ("6 · CRICKET", "Teen Sooryavanshi smashes unbeaten 204 off 53 balls",
+     "The 17-year-old's record knock powers India past the UAE.",
+     cricket_thumb),
 ]
 
 
@@ -312,7 +349,7 @@ def main():
     d.rectangle([0, 0, W, 96], fill=NAVY)
     d.text((W // 2, 10), "A DAY AROUND THE WORLD", font=fnt(SERIF, 44),
            fill=(255, 255, 255), anchor="ma")
-    d.text((W // 2, 62), "THURSDAY, 26 NOVEMBER 2026  ·  SIX STORIES, ONE DAY",
+    d.text((W // 2, 62), "FRIDAY, 27 NOVEMBER 2026  ·  SIX STORIES, ONE DAY",
            font=fnt(SANSB, 19), fill=GOLD, anchor="ma")
 
     # Map band
@@ -321,22 +358,22 @@ def main():
 
     # Lead story
     y = 272
-    d.text((MARGIN, y), "1 · KYIV — THE LEAD", font=fnt(SANSB, 19),
+    d.text((MARGIN, y), "1 · BANGKOK — THE LEAD", font=fnt(SANSB, 19),
            fill=RED)
     y += 28
     y = para(d, MARGIN, y,
-             "Russian missiles hit Kyiv overnight; seven wounded",
+             "Massive fire at Bangkok oil refinery; several injured",
              fnt(SANSB, 31), INK, W - 2 * MARGIN, 34)
     y += 4
     hero = Image.new("RGB", (W - 2 * MARGIN, 150), PAPER)
     hd = ImageDraw.Draw(hero)
-    kyiv_hero(hd, 0, 0, W - 2 * MARGIN, 150)
+    bangkok_hero(hd, 0, 0, W - 2 * MARGIN, 150)
     img.paste(hero, (MARGIN, y))
     d.rectangle([MARGIN, y, W - MARGIN, y + 150], outline=INK, width=2)
     y += 150 + 8
     y = para(d, MARGIN, y,
-             "Ballistic missiles struck a shopping centre in the capital's "
-             "Desnianskyi district; the mayor says seven people were hurt.",
+             "Flames leapt from a ruptured tank at the Bangchak plant; "
+             "the company shut every unit as crews fought the blaze.",
              fnt(SANS, 19), INK, W - 2 * MARGIN, 25)
     y += 6
     hline(d, MARGIN, y, W - MARGIN, 2)
@@ -365,13 +402,13 @@ def main():
     d.rectangle([0, 966, W, H], fill=NAVY)
     d.text((MARGIN, 976), "ALSO TODAY", font=fnt(SANSB, 16), fill=GOLD)
     para(d, 150, 976,
-         "EU leaders meet over a 2 trillion euro budget · King tides flood "
-         "California's coast · Memory-chip shortage triples some RAM prices "
-         "· China investigates Shanghai party chief Chen Jining",
+         "Saudi Arabia intercepts two Houthi missiles aimed at Riyadh · "
+         "Karachi building collapse kills three · Bank of Korea lifts rates "
+         "on the AI chip boom · Flipkart CEO to step down next month",
          fnt(SANS, 16), (255, 255, 255), W - MARGIN - 150, 20)
     print("story rows end near y =", y, "of", H)
 
-    out = os.path.join(HERE, "entry-r4.png")
+    out = os.path.join(HERE, "entry-r5.png")
     img.save(out, "PNG", optimize=True)
     print("wrote", out, os.path.getsize(out), "bytes")
 
